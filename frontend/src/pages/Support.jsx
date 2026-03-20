@@ -237,15 +237,15 @@ const Support = () => {
           <ContactCard 
             icon={<Phone className="w-8 h-8 text-blue-500" />}
             title="Call Us"
-            value="+91 98765 43210"
-            link="tel:+919876543210"
+            value="+91 70672 63151"
+            link="tel:+917067263151"
             color="blue"
           />
           <ContactCard 
             icon={<Mail className="w-8 h-8 text-primary" />}
-            title="Email Support"
-            value="support@rishifood.com"
-            link="mailto:support@rishifood.com"
+            title="Email Us"
+            value="rawatrishi181@gmail.com"
+            link="mailto:rawatrishi181@gmail.com"
             color="red"
           />
           <ContactCard 

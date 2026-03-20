@@ -61,6 +61,7 @@ const orderDeliveredTemplate = (name, orderId, restaurantName, totalAmount) => {
             </table>
             <div class="footer">
                 <p>&copy; 2026 Rishi Food Delivery. All rights reserved.</p>
+                <p>Support: rawatrishi181@gmail.com | +91 70672 63151</p>
             </div>
         </div>
     </body>

@@ -98,9 +98,13 @@ export const Footer = () => {
                 <MapPin className="w-5 h-5 text-primary shrink-0" />
                 <span>123 Food Street, Tasty City</span>
               </a>
-              <a href="tel:+919876543210" className="flex items-center justify-center sm:justify-start gap-3 hover:text-primary transition-colors">
+              <a href="tel:+917067263151" className="flex items-center justify-center sm:justify-start gap-3 hover:text-primary transition-colors">
                 <Phone className="w-5 h-5 text-primary shrink-0" />
-                <span>+91 98765 43210</span>
+                <span>+91 70672 63151</span>
+              </a>
+              <a href="mailto:rawatrishi181@gmail.com" className="flex items-center justify-center sm:justify-start gap-3 hover:text-primary transition-colors">
+                <Mail className="w-5 h-5 text-primary shrink-0" />
+                <span>rawatrishi181@gmail.com</span>
               </a>
             </div>
             

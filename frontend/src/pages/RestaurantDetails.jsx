@@ -252,7 +252,7 @@ const RestaurantDetails = () => {
                 
                 <div className="flex flex-col gap-1">
                   <span className="text-gray-400 font-medium uppercase text-[10px] tracking-widest">Contact Info</span>
-                  <span className="font-semibold text-gray-700 text-base">{restaurant.phone || '+91 98765 43210'}</span>
+                  <span className="font-semibold text-gray-700 text-base">{restaurant.phone || '+91 70672 63151'}</span>
                 </div>
 
                 <div className="pt-6 border-t border-gray-50 mt-6">

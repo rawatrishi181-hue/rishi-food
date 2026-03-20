@@ -62,7 +62,7 @@ const welcomeTemplate = (name) => {
             </table>
             <div class="footer">
                 <p>&copy; 2026 Rishi Food Delivery. All rights reserved.</p>
-                <p>123 Foodie Street, Culinary District, India</p>
+                <p>Support: rawatrishi181@gmail.com | +91 70672 63151</p>
                 <p><a href="#" style="color: #94a3b8; text-decoration: underline;">Unsubscribe</a> | <a href="#" style="color: #94a3b8; text-decoration: underline;">Privacy Policy</a></p>
             </div>
         </div>
