@@ -6,7 +6,7 @@ import { SocketProvider } from './context/SocketContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 
-// Pages
+// Pages    
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
