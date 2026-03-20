@@ -39,6 +39,8 @@ const Home = () => {
 
       const [restRes, catRes] = await Promise.all([
         restaurantService.getAll(params),
+
+        
         categoryService.getAll(),
       ]);
       
