@@ -5,6 +5,7 @@ import { CartProvider } from './context/CartContext';
 import { SocketProvider } from './context/SocketContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
+import ScrollToTop from './components/common/ScrollToTop';
 
 // Pages    
 import Home from './pages/Home';
@@ -47,6 +48,7 @@ function App() {
       <SocketProvider>
         <CartProvider>
           <BrowserRouter>
+            <ScrollToTop />
             <div className="min-h-screen bg-gray-50 flex flex-col">
               <Navbar />
               <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">

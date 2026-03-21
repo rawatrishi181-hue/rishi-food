@@ -249,35 +249,50 @@ const Home = () => {
       )}
 
       {/* Categories Slider */}
-      <section className="container mx-auto px-4">
+      <section className="container mx-auto px-4 overflow-hidden">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-black text-gray-800 italic flex items-center gap-3">
             <Sparkles className="w-8 h-8 text-primary fill-current" />
             Popular Categories
           </h2>
           <div className="flex gap-2">
-            <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors">
+            <button 
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+              onClick={() => {
+                document.getElementById('categories-slider').scrollBy({ left: -200, behavior: 'smooth' });
+              }}
+            >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors">
+            <button 
+              className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+              onClick={() => {
+                document.getElementById('categories-slider').scrollBy({ left: 200, behavior: 'smooth' });
+              }}
+            >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         </div>
-        <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div 
+          id="categories-slider"
+          className="flex gap-4 sm:gap-6 overflow-x-auto pb-8 pt-4 px-2 scrollbar-hide snap-x snap-mandatory"
+          style={{ scrollBehavior: 'smooth' }}
+        >
           {categories.map((category, index) => (
             <motion.div
               key={category._id}
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              viewport={{ once: true, margin: "-50px" }}
+              className="snap-start shrink-0"
             >
               <Link
-                to={`/category/${category._id}`}
-                className="group flex flex-col items-center gap-4 min-w-[120px] sm:min-w-[160px]"
+                to={`/category/${category.name}`}
+                className="group flex flex-col items-center gap-4 w-[100px] sm:w-[140px]"
               >
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[40px] bg-white shadow-lg border border-gray-50 flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-primary/20 group-hover:-translate-y-2 relative">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[30px] sm:rounded-[40px] bg-white shadow-md border border-gray-50 flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:shadow-xl group-hover:shadow-primary/20 group-hover:-translate-y-2 relative">
                   <img
                     src={category.image || `https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80`}
                     alt={category.name}
@@ -288,7 +303,7 @@ const Home = () => {
                   />
                   <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <span className="font-black text-gray-700 text-sm uppercase tracking-widest group-hover:text-primary transition-colors">
+                <span className="font-black text-gray-700 text-[10px] sm:text-xs uppercase tracking-widest group-hover:text-primary transition-colors text-center w-full truncate px-2">
                   {category.name}
                 </span>
               </Link>

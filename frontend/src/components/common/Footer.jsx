@@ -27,10 +27,10 @@ export const Footer = () => {
   };
 
   const categories = [
-    { name: 'Pizza', path: '/category/pizza' },
-    { name: 'Burgers', path: '/category/burgers' },
-    { name: 'Sushi', path: '/category/sushi' },
-    { name: 'Desserts', path: '/category/desserts' },
+    { name: 'Pizza', path: '/category/Pizza' },
+    { name: 'Burgers', path: '/category/Burgers' },
+    { name: 'Sushi', path: '/category/Sushi' },
+    { name: 'Desserts', path: '/category/Desserts' },
   ];
 
   return (

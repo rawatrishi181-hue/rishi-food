@@ -12,7 +12,8 @@ const Profile = () => {
     name: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    profileImage: ''
   });
 
   useEffect(() => {
@@ -21,10 +22,26 @@ const Profile = () => {
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        address: user.address || ''
+        address: user.address || '',
+        profileImage: user.profileImage || ''
       });
     }
   }, [user]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image size should be less than 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, profileImage: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,8 +69,24 @@ const Profile = () => {
         {/* Profile Sidebar */}
         <div className="md:col-span-1">
           <div className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[32px] shadow-xl border border-gray-50 flex flex-col items-center text-center">
-            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-primary/10 rounded-full flex items-center justify-center mb-4 sm:mb-6 border-4 border-white shadow-lg">
-              <UserCircle className="w-16 h-16 sm:w-20 sm:h-20 text-primary" />
+            <div className="relative group cursor-pointer" onClick={() => document.getElementById('profileImageInput').click()}>
+              <div className="w-24 h-24 sm:w-32 sm:h-32 bg-primary/10 rounded-full flex items-center justify-center mb-4 sm:mb-6 border-4 border-white shadow-lg overflow-hidden transition-all duration-300 group-hover:opacity-80">
+                {formData.profileImage ? (
+                  <img src={formData.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <UserCircle className="w-16 h-16 sm:w-20 sm:h-20 text-primary" />
+                )}
+              </div>
+              <div className="absolute inset-0 bg-black/40 rounded-full mb-4 sm:mb-6 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span className="text-white text-xs font-bold">Change Photo</span>
+              </div>
+              <input 
+                type="file" 
+                id="profileImageInput" 
+                className="hidden" 
+                accept="image/*" 
+                onChange={handleImageChange} 
+              />
             </div>
             <h3 className="text-lg sm:text-xl font-bold text-gray-800">{user.name}</h3>
             <p className="text-[10px] sm:text-sm text-gray-400 font-medium uppercase tracking-widest mt-1">{user.role}</p>

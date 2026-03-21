@@ -7,17 +7,18 @@ export const Logo = ({
   size = 'md' 
 }) => {
   const sizes = {
-    sm: 'h-8',
+    xs: 'h-8',
+    sm: 'h-10',
     md: 'h-12',
     lg: 'h-16',
-    xl: 'h-24'
+    xl: 'h-20'
   };
 
   const textColor = theme === 'dark' ? 'text-gray-900' : 'text-white';
   
   return (
-    <div className={`inline-flex items-center gap-3 ${className} ${sizes[size]}`}>
-      {/* Icon Part */}
+    <div className={`inline-flex items-center gap-2.5 ${className} ${sizes[size]}`}>
+      {/* Professional Minimalist Icon */}
       <svg 
         viewBox="0 0 100 100" 
         className="h-full w-auto drop-shadow-sm" 
@@ -25,40 +26,63 @@ export const Logo = ({
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#e81d2d" />
-            <stop offset="100%" stopColor="#ff4d4d" />
+          <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ef4444" /> {/* red-500 */}
+            <stop offset="100%" stopColor="#dc2626" /> {/* red-600 */}
           </linearGradient>
         </defs>
-        
-        {/* Modern Cloche / Plate Base */}
+
+        {/* Outer Circular Accent */}
+        <circle 
+          cx="50" cy="50" r="45" 
+          stroke="url(#primaryGradient)" 
+          strokeWidth="4" 
+          strokeDasharray="40 10" 
+          strokeLinecap="round" 
+          className="origin-center"
+          style={{ transform: 'rotate(-45deg)' }}
+        />
+
+        {/* Abstract Fork & Knife forming 'R' */}
+        {/* Knife line (Stem of R) */}
         <path 
-          d="M10 75C10 75 25 85 50 85C75 85 90 75 90 75" 
-          stroke="url(#logoGradient)" 
+          d="M38 25 V75" 
+          stroke="url(#primaryGradient)" 
           strokeWidth="8" 
           strokeLinecap="round" 
         />
         
-        {/* Stylized 'R' Flame / Steam */}
+        {/* Top curve of R (Fork prongs abstract) */}
         <path 
-          d="M45 65V25C45 25 45 15 60 15C75 15 75 30 75 30C75 30 75 45 60 45H45L70 65" 
-          stroke="url(#logoGradient)" 
-          strokeWidth="10" 
+          d="M38 25 H55 C65 25 65 45 55 45 H38" 
+          stroke="url(#primaryGradient)" 
+          strokeWidth="8" 
           strokeLinecap="round" 
           strokeLinejoin="round" 
         />
-        
-        {/* Speed Lines for Delivery */}
-        <path d="M15 35H30" stroke="url(#logoGradient)" strokeWidth="4" strokeLinecap="round" opacity="0.6" />
-        <path d="M10 45H25" stroke="url(#logoGradient)" strokeWidth="4" strokeLinecap="round" opacity="0.4" />
-        <path d="M20 55H35" stroke="url(#logoGradient)" strokeWidth="4" strokeLinecap="round" opacity="0.2" />
+
+        {/* Leg of R */}
+        <path 
+          d="M48 45 L65 75" 
+          stroke="url(#primaryGradient)" 
+          strokeWidth="8" 
+          strokeLinecap="round" 
+        />
+
+        {/* Minimal Dot (Food element) */}
+        <circle cx="70" cy="35" r="5" fill="url(#primaryGradient)" />
       </svg>
 
-      {/* Text Part */}
+      {/* Professional Typography */}
       {variant === 'full' && (
-        <span className={`font-black italic tracking-tighter text-2xl md:text-3xl ${textColor}`}>
-          Rishi<span className="text-primary">Food</span>
-        </span>
+        <div className="flex flex-col justify-center">
+          <span className={`font-black tracking-tight leading-none ${size === 'xs' ? 'text-xl' : size === 'sm' ? 'text-2xl' : 'text-3xl'} ${textColor}`}>
+            Rishi<span className="text-red-500">Food</span>
+          </span>
+          <span className="text-[0.65em] font-semibold tracking-[0.2em] text-gray-400 uppercase mt-0.5 ml-0.5">
+            Delivery
+          </span>
+        </div>
       )}
     </div>
   );

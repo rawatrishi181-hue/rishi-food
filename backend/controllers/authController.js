@@ -52,6 +52,7 @@ const register = async (req, res) => {
                 role: user.role,
                 phone: user.phone,
                 address: user.address,
+                profileImage: user.profileImage,
                 token: generateToken(user._id),
                 createdAt: user.createdAt
             });
@@ -87,6 +88,7 @@ const login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                profileImage: user.profileImage,
                 token: generateToken(user._id)
             });
         } else {
@@ -115,6 +117,7 @@ const getProfile = async (req, res) => {
                 role: user.role,
                 phone: user.phone,
                 address: user.address,
+                profileImage: user.profileImage,
                 createdAt: user.createdAt
             });
         } else {

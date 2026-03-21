@@ -71,11 +71,19 @@ export const Navbar = () => {
             {user ? (
               <div className="flex items-center gap-2 sm:gap-3">
                 <Link to="/profile" className="flex items-center gap-2 group p-1 sm:p-2 rounded-xl hover:bg-gray-50 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
-                    <User className="w-4 h-4 text-primary group-hover:text-white" />
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden group-hover:bg-primary transition-colors">
+                    {user.profileImage ? (
+                      <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-4 h-4 text-primary group-hover:text-white" />
+                    )}
                   </div>
                   <span className="text-sm font-bold text-gray-700 hidden lg:block">{user.name}</span>
                 </Link>
+                <button onClick={() => { logout(); navigate('/'); }} className="hidden sm:flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors font-bold text-sm">
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden lg:block">Logout</span>
+                </button>
                 <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 text-gray-600 hover:text-primary transition-colors">
                   {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </button>
@@ -126,7 +134,7 @@ export const Navbar = () => {
           </div>
 
           {user && (
-            <button onClick={logout} className="w-full flex items-center justify-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl font-bold text-sm transition-colors active:bg-red-100">
+            <button onClick={() => { logout(); setIsMenuOpen(false); navigate('/'); }} className="w-full flex items-center justify-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl font-bold text-sm transition-colors active:bg-red-100">
               <LogOut className="w-4 h-4" /> Logout
             </button>
           )}
