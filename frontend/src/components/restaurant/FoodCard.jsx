@@ -3,7 +3,7 @@ import { Button } from '../common/Button';
 import { cn } from '../../utils/cn';
 
 export const FoodCard = ({ food, onAddToCart }) => {
-  const imageUrl = food.image || `https://source.unsplash.com/featured/?food,${encodeURIComponent(food.name)}`;
+  const imageUrl = food.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
   
   // Dummy rating if not present
   const rating = food.rating || (Math.random() * (5 - 3.5) + 3.5).toFixed(1);
@@ -78,7 +78,7 @@ export const FoodCard = ({ food, onAddToCart }) => {
             size="sm" 
             variant="outline" 
             className="rounded-xl font-bold border-gray-200 text-primary hover:bg-primary/5 hover:border-primary px-6"
-            onClick={() => onAddToCart(food._id)}
+            onClick={() => onAddToCart(food)}
           >
             ADD <Plus className="w-4 h-4 ml-1" />
           </Button>

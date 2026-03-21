@@ -228,7 +228,14 @@ const AdminRestaurants = () => {
             {filteredRestaurants.map((rest) => (
               <div key={rest._id} className="bg-white p-6 rounded-[32px] border border-gray-50 shadow-xl flex items-center gap-8 group card-hover">
                 <div className="w-32 h-32 rounded-2xl overflow-hidden shadow-md flex-shrink-0">
-                  <img src={rest.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={rest.name} />
+                  <img 
+                    src={rest.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80'} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                    alt={rest.name} 
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80';
+                    }}
+                  />
                 </div>
                 
                 <div className="flex-grow">

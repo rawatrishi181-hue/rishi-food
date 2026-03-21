@@ -83,7 +83,29 @@ export const commonService = {
   subscribeNewsletter: (email) => api.post('/subscribe', { email }),
 };
 
+export const bannerService = {
+  getAll: () => api.get('/banners'),
+  create: (data) => api.post('/banners', data),
+  delete: (id) => api.delete(`/banners/${id}`),
+};
+
+export const supportService = {
+  getFAQs: () => api.get('/support/faqs'),
+  createTicket: (data) => api.post('/support/tickets', data),
+  getMyTickets: () => api.get('/support/tickets/me'),
+  getAllTickets: () => api.get('/support/tickets'),
+  updateTicket: (id, data) => api.put(`/support/tickets/${id}`, data),
+  createFAQ: (data) => api.post('/support/faqs', data),
+  deleteFAQ: (id) => api.delete(`/support/faqs/${id}`),
+};
+
 export const deliveryPartnerService = {
+  sendOTP: (data) => api.post('/delivery-partners/send-otp', data),
+  verifyOTP: (data) => api.post('/delivery-partners/verify-otp', data),
+  getDashboard: () => api.get('/delivery-partners/dashboard'),
+  updateProfile: (data) => api.put('/delivery-partners/profile', data),
+  acceptOrder: (data) => api.post('/delivery-partners/orders/accept', data),
+  completeDelivery: (data) => api.post('/delivery-partners/orders/complete', data),
   getAll: (params) => api.get('/delivery-partners', { params }),
   create: (data) => api.post('/delivery-partners', data),
   update: (id, data) => api.put(`/delivery-partners/${id}`, data),
@@ -91,15 +113,6 @@ export const deliveryPartnerService = {
   updateLocation: (data) => api.post('/delivery/location', data),
 };
 
-export const supportService = {
-  getFAQs: () => api.get('/support/faqs'),
-  createTicket: (data) => api.post('/support/tickets', data),
-  getMyTickets: () => api.get('/support/tickets/my'),
-  getAllTickets: () => api.get('/support/tickets'),
-  updateTicket: (id, data) => api.put(`/support/tickets/${id}`, data),
-  createFAQ: (data) => api.post('/support/faqs', data),
-  deleteFAQ: (id) => api.delete(`/support/faqs/${id}`),
-};
 
 export const couponService = {
   getAll: () => api.get('/coupons'),

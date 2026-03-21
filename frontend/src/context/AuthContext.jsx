@@ -48,10 +48,13 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await authService.register(userData);
-      toast.success('Registration successful! Please login.');
-      return response.data;
+      const authData = response.data;
+      localStorage.setItem('token', authData.token);
+      setUser(authData);
+      toast.success('Registration and Login successful!');
+      return authData;
     } catch (error) {
-      toast.error(error || 'Registration failed');
+      toast.error(error.message || 'Registration failed');
       throw error;
     }
   };

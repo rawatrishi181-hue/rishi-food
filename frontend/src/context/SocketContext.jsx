@@ -12,7 +12,8 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
         if (user) {
-            const newSocket = io('http://127.0.0.1:5000');
+            const socketUrl = import.meta.env.PROD ? '/' : 'http://127.0.0.1:5000';
+            const newSocket = io(socketUrl);
             setSocket(newSocket);
 
             newSocket.emit('join', {

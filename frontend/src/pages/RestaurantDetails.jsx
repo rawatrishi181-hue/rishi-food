@@ -19,9 +19,13 @@ const RestaurantDetails = () => {
   const { addItemToCart } = useCart();
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
 
+  const [activeCategory, setActiveCategory] = useState('All');
+
   useEffect(() => {
     fetchData();
   }, [id]);
+
+  const categories = ['All', ...new Set(menu.map(item => item.category))];
 
   const fetchData = async () => {
     try {
@@ -32,10 +36,11 @@ const RestaurantDetails = () => {
         reviewService.getByRestaurant(id)
       ]);
       
-      console.log('Restaurant Details Data:', { restRes, menuRes, reviewRes });
+      const restData = restRes?.data || restRes;
+      const menuData = menuRes?.data || menuRes || [];
       
-      setRestaurant(restRes?.data || restRes);
-      setMenu(menuRes?.data || menuRes || []);
+      setRestaurant(restData);
+      setMenu(menuData);
       setReviews(reviewRes?.data || reviewRes || []);
     } catch (error) {
       toast.error('Failed to load restaurant details');
@@ -57,18 +62,20 @@ const RestaurantDetails = () => {
     }
   };
 
-  const handleAddToCart = async (foodId) => {
+  const handleAddToCart = async (food) => {
     try {
-      await addItemToCart(foodId, 1);
+      await addItemToCart(food, 1);
     } catch (error) {
       // Error handled by CartContext
     }
   };
 
-  const filteredMenu = menu.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.category?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMenu = menu.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         item.category?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   if (loading) return (
     <div className="flex justify-center items-center h-[60vh]">
@@ -93,7 +100,7 @@ const RestaurantDetails = () => {
           className="w-full h-full object-cover"
           alt={restaurant.name}
           onError={(e) => {
-            e.target.src = 'https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?auto=format&fit=crop&w=1200&q=80';
+            e.target.src = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-4 sm:p-6 md:p-12 text-white">
@@ -129,17 +136,36 @@ const RestaurantDetails = () => {
         {/* Main Content */}
         <div className="flex-grow space-y-6 sm:space-y-8">
           {/* Menu Header & Search */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 border-b pb-4 sm:pb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 italic">Menu</h2>
-            <div className="relative w-full sm:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
-              <input 
-                type="text" 
-                placeholder="Search dishes..."
-                className="w-full pl-9 pr-4 py-2 sm:pl-10 sm:py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm text-sm"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+          <div className="flex flex-col gap-6 border-b pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 italic">Menu</h2>
+              <div className="relative w-full sm:w-80">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                <input 
+                  type="text" 
+                  placeholder="Search dishes..."
+                  className="w-full pl-9 pr-4 py-2 sm:pl-10 sm:py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm text-sm"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${
+                    activeCategory === cat
+                      ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105'
+                      : 'bg-white text-gray-500 border border-gray-100 hover:bg-gray-50'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -160,7 +186,7 @@ const RestaurantDetails = () => {
                     isBestSeller: Math.random() > 0.7,
                     discount: Math.random() > 0.8 ? 20 : 0
                   }} 
-                  onAddToCart={handleAddToCart} 
+                  onAddToCart={() => handleAddToCart(food)} 
                 />
               ))}
             </div>

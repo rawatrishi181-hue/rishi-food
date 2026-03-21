@@ -23,6 +23,9 @@ import AdminRestaurants from './pages/AdminRestaurants';
 import AdminFood from './pages/AdminFood';
 import Notifications from './pages/Notifications';
 import SearchResults from './pages/SearchResults';
+import PartnerLanding from './pages/PartnerLanding';
+import PartnerRegister from './pages/PartnerRegister';
+import PartnerDashboard from './pages/PartnerDashboard';
 import NotFound from './pages/NotFound';
 
 // Placeholders for remaining pages
@@ -56,6 +59,11 @@ function App() {
                   <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
                   <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
                   <Route path="/search" element={<SearchResults />} />
+
+                  {/* Delivery Partner Routes */}
+                  <Route path="/partner" element={<PartnerLanding />} />
+          <Route path="/partner/register" element={<PartnerRegister />} />
+          <Route path="/partner/dashboard" element={<PartnerDashboard />} />
                   <Route path="/category/:name" element={<CategoryFoods />} />
                   <Route path="/delivery-partners" element={<ProtectedRoute adminOnly><DeliveryPartnerDashboard /></ProtectedRoute>} />
                   <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />

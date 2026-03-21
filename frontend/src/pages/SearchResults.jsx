@@ -86,7 +86,14 @@ const SearchResults = () => {
                     className="bg-white rounded-[32px] overflow-hidden shadow-xl border border-gray-50 group card-hover"
                   >
                     <div className="relative h-48 overflow-hidden">
-                      <img src={rest.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={rest.name} />
+                      <img 
+                        src={rest.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                        alt={rest.name} 
+                        onError={(e) => {
+                          e.target.src = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80';
+                        }}
+                      />
                       <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-2 py-1 rounded-xl flex items-center gap-1.5 text-xs font-black shadow-lg">
                         <Star className="w-3.5 h-3.5 text-green-600 fill-green-600" />
                         <span>{rest.rating || '4.2'}</span>

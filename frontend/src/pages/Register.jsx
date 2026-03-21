@@ -23,7 +23,7 @@ const Register = () => {
     setLoading(true);
     try {
       await register(formData);
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       // Error handled by AuthContext
     } finally {

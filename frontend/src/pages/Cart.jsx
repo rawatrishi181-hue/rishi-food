@@ -42,6 +42,12 @@ const Cart = () => {
   };
 
   const handlePlaceOrder = async () => {
+    if (!user) {
+      toast.error('Please Login to place your order');
+      navigate('/login');
+      return;
+    }
+
     try {
       if (!user.address) {
         toast.error('Please update your delivery address in profile first');
@@ -121,8 +127,8 @@ const Cart = () => {
                   <ShoppingBag className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-800 text-sm sm:text-base">Items from {cart.restaurantId?.name || 'Restaurant'}</h3>
-                  <p className="text-[10px] sm:text-xs text-gray-400 font-medium uppercase tracking-widest">{cart.restaurantId?.city || 'Your City'}</p>
+                  <h3 className="font-bold text-gray-800 text-sm sm:text-base">Your Cart Items</h3>
+                  <p className="text-[10px] sm:text-xs text-gray-400 font-medium uppercase tracking-widest">{cart.items.length} items selected</p>
                 </div>
               </div>
               <button 

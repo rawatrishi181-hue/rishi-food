@@ -129,6 +129,9 @@ const Support = () => {
                     src={faq.image || `https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=500&q=80`} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                     alt={faq.question} 
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=500&q=80';
+                    }}
                   />
                   <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-xl font-black text-[10px] text-primary shadow-lg uppercase tracking-widest">
                     {faq.category || 'General'}
