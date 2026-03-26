@@ -25,13 +25,21 @@ const AdminFood = () => {
     fetchRestaurants();
   }, []);
 
+  const dummyFoods = [
+    { _id: 'dummy1', name: 'Paneer Butter Masala', description: 'Creamy paneer curry with house spices.', price: 280, category: 'Vegetarian', restaurantId: { name: 'Royal Dhaba' }, image: '', isAvailable: true },
+    { _id: 'dummy2', name: 'Chicken Biryani', description: 'Fragrant basmati rice with tender chicken pieces.', price: 320, category: 'Non-Veg', restaurantId: { name: 'Tandoori Flames' }, image: '', isAvailable: true },
+    { _id: 'dummy3', name: 'Veg Thali', description: 'Assorted vegetables, dal, rice and roti.', price: 220, category: 'Vegetarian', restaurantId: { name: 'Green Garden' }, image: '', isAvailable: true }
+  ];
+
   const fetchFoods = async () => {
     try {
       setLoading(true);
       const response = await api.get('/foods');
-      setFoods(response.data.data || []);
+      const items = response.data.data || [];
+      setFoods(items.length > 0 ? items : dummyFoods);
     } catch (error) {
-      toast.error('Failed to fetch food items');
+      toast.error('Failed to fetch food items; showing sample menu');
+      setFoods(dummyFoods);
     } finally {
       setLoading(false);
     }

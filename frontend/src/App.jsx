@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { SocketProvider } from './context/SocketContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import ScrollToTop from './components/common/ScrollToTop';
@@ -18,41 +19,47 @@ import CategoryFoods from './pages/CategoryFoods';
 import DeliveryPartnerDashboard from './pages/DeliveryPartnerDashboard';
 import Orders from './pages/Orders';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminOrders from './pages/AdminOrders';
 import Support from './pages/Support';
 import AdminSupport from './pages/AdminSupport';
 import AdminRestaurants from './pages/AdminRestaurants';
 import AdminFood from './pages/AdminFood';
+import AdminCoupons from './pages/AdminCoupons';
 import Notifications from './pages/Notifications';
 import SearchResults from './pages/SearchResults';
 import PartnerLanding from './pages/PartnerLanding';
 import PartnerRegister from './pages/PartnerRegister';
 import PartnerDashboard from './pages/PartnerDashboard';
+import VendorDashboard from './pages/VendorDashboard';
+import VendorMenu from './pages/VendorMenu';
 import NotFound from './pages/NotFound';
 
 // Placeholders for remaining pages
 const Admin = () => <div className="p-8"><h1 className="text-2xl font-bold italic text-primary">Admin Dashboard (Coming Soon)</h1></div>;
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const ProtectedRoute = ({ children, adminOnly = false, vendorOnly = false }) => {
   const { user, loading } = useAuth();
 
   if (loading) return <div className="flex h-screen items-center justify-center animate-pulse text-primary font-bold">Loading...</div>;
   if (!user) return <Navigate to="/login" />;
   if (adminOnly && user.role !== 'admin') return <Navigate to="/" />;
+  if (vendorOnly && user.role !== 'restaurant') return <Navigate to="/" />;
 
   return children;
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <SocketProvider>
-        <CartProvider>
-          <BrowserRouter>
-            <ScrollToTop />
-            <div className="min-h-screen bg-gray-50 flex flex-col">
-              <Navbar />
-              <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-                <Routes>
+    <ThemeProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <CartProvider>
+            <BrowserRouter>
+              <ScrollToTop />
+              <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-300">
+                <Navbar />
+                <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+                  <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
@@ -66,11 +73,17 @@ function App() {
                   <Route path="/partner" element={<PartnerLanding />} />
           <Route path="/partner/register" element={<PartnerRegister />} />
           <Route path="/partner/dashboard" element={<PartnerDashboard />} />
+                  {/* Vendor Routes */}
+          <Route path="/vendor" element={<ProtectedRoute vendorOnly><VendorDashboard /></ProtectedRoute>} />
+          <Route path="/vendor/menu" element={<ProtectedRoute vendorOnly><VendorMenu /></ProtectedRoute>} />
                   <Route path="/category/:name" element={<CategoryFoods />} />
                   <Route path="/delivery-partners" element={<ProtectedRoute adminOnly><DeliveryPartnerDashboard /></ProtectedRoute>} />
                   <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="/admin/orders" element={<ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>} />
                   <Route path="/admin/restaurants" element={<ProtectedRoute adminOnly><AdminRestaurants /></ProtectedRoute>} />
+                  <Route path="/admin/vendors" element={<ProtectedRoute adminOnly><AdminRestaurants /></ProtectedRoute>} />
                   <Route path="/admin/food" element={<ProtectedRoute adminOnly><AdminFood /></ProtectedRoute>} />
+                  <Route path="/admin/coupons" element={<ProtectedRoute adminOnly><AdminCoupons /></ProtectedRoute>} />
                   <Route path="/admin/support" element={<ProtectedRoute adminOnly><AdminSupport /></ProtectedRoute>} />
                   <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
                   <Route path="/support" element={<Support />} />
@@ -84,6 +97,7 @@ function App() {
         </CartProvider>
       </SocketProvider>
     </AuthProvider>
+    </ThemeProvider>
   );
 }
 

@@ -13,6 +13,7 @@ export const restaurantService = {
   getMenu: (id) => api.get(`/restaurants/${id}/menu`),
   create: (data) => api.post('/restaurants', data),
   update: (id, data) => api.put(`/restaurants/${id}`, data),
+  updateCommission: (id, commissionPercentage) => api.put(`/restaurants/${id}/commission`, { commissionPercentage }),
   delete: (id) => api.delete(`/restaurants/${id}`),
 };
 
@@ -50,8 +51,17 @@ export const adminService = {
   getTopRestaurants: () => api.get('/admin/top-restaurants'),
   getTopFoods: () => api.get('/admin/top-foods'),
   getOrdersAnalytics: () => api.get('/admin/orders-analytics'),
+  getOrdersReport: (query = '') => api.get(`/admin/orders-report${query ? `?${query}` : ''}`),
+  getRevenueTrend: () => api.get('/admin/revenue'),
   getRecentOrders: () => api.get('/admin/recent-orders'),
   getAnalytics: () => api.get('/admin/analytics'),
+};
+
+export const vendorService = {
+  getMyRestaurant: () => api.get('/restaurants/me'),
+  getMenu: (restaurantId) => api.get(`/restaurants/${restaurantId}/menu`),
+  addProduct: (data) => api.post('/foods', data),
+  getVendorOrders: () => api.get('/orders/vendor'),
 };
 
 export const notificationService = {

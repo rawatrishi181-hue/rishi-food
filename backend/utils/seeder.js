@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Restaurant = require('../models/Restaurant');
 const Food = require('../models/Food');
 const Category = require('../models/Category');
+const DeliveryPartner = require('../models/DeliveryPartner');
 
 dotenv.config({ path: './.env' });
 
@@ -15,6 +16,7 @@ const seedData = async () => {
         await Food.deleteMany();
         await Restaurant.deleteMany();
         await Category.deleteMany();
+        await DeliveryPartner.deleteMany();
         
         // 1. Setup Categories
         const categoryData = [
@@ -193,6 +195,42 @@ const seedData = async () => {
 
         const insertedFoods = await Food.insertMany(foods);
         console.log(`Created ${insertedFoods.length} Food items (Avg ~10 per restaurant)...`);
+
+        // 4. Generate 15 Dummy Delivery Partners
+        const firstNames = ['Raj', 'Arjun', 'Aditya', 'Rohan', 'Vikram', 'Sanjay', 'Harish', 'Nikhil', 'Pawan', 'Deepak', 'Ashok', 'Suresh', 'Ramesh', 'Kumar', 'Ankit'];
+        const lastNames = ['Singh', 'Kumar', 'Patel', 'Sharma', 'Khan', 'Verma', 'Yadav', 'Gupta', 'Reddy', 'Nair'];
+        const vehicleTypes = ['Bike', 'Scooter', 'Cycle'];
+        
+        const partners = [];
+        for (let i = 0; i < 15; i++) {
+            const firstName = firstNames[i % firstNames.length];
+            const lastName = lastNames[Math.floor(i / firstNames.length) % lastNames.length];
+            const city = cities[i % cities.length];
+            const vehicleType = vehicleTypes[i % vehicleTypes.length];
+            
+            partners.push({
+                name: `${firstName} ${lastName}`,
+                phone: `98${String(i).padStart(8, '0')}00`,
+                email: `rider${i+1}@gmail.com`,
+                city: city,
+                vehicleType: vehicleType,
+                documents: {
+                    license: `DL-${city.substring(0, 3).toUpperCase()}-${String(i).padStart(4, '0')}`
+                },
+                isVerified: true,
+                status: i % 3 === 0 ? 'Offline' : (i % 3 === 1 ? 'Busy' : 'Active'),
+                isOnline: i % 3 === 2,
+                rating: (4.0 + Math.random() * 1).toFixed(1),
+                totalDeliveries: Math.floor(Math.random() * 500) + 10,
+                earnings: {
+                    total: Math.floor(Math.random() * 50000) + 5000,
+                    weekly: Math.floor(Math.random() * 5000) + 500
+                }
+            });
+        }
+        
+        const insertedPartners = await DeliveryPartner.insertMany(partners);
+        console.log(`Created ${insertedPartners.length} Delivery Partners...`);
 
         console.log('Seeding Done Successfully!');
         process.exit();

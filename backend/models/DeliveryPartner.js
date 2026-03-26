@@ -12,6 +12,7 @@ const deliveryPartnerSchema = new mongoose.Schema({
     },
     isVerified: { type: Boolean, default: false },
     isOnline: { type: Boolean, default: false },
+    status: { type: String, enum: ['Active', 'Offline', 'Busy'], default: 'Offline' },
     currentLocation: {
         lat: { type: Number },
         lng: { type: Number }

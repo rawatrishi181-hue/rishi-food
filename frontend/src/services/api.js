@@ -1,16 +1,22 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
-console.log('API Base URL:', baseURL);
+// Dynamically set baseURL for deployment and local dev
+const defaultLocalURL = 'http://localhost:5000/api';
+const envURL = import.meta.env.VITE_API_URL;
+const baseURL = envURL || defaultLocalURL;
+
+// Log helpful error if backend cannot be reached
+console.info('API Base URL:', baseURL);
 
 const api = axios.create({
   baseURL,
+  timeout: 15000, // 15s
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add a request interceptor to include auth token
+// Request interceptor includes auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -19,17 +25,21 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Add a response interceptor to handle errors globally
+// Response interceptor handles errors globally
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    const message = error.response?.data?.message || error.message || 'Something went wrong';
-    if (error.response?.status === 401) {
+    if (!error.response) {
+      // Network or CORS error
+      console.error('Network error: could not reach API at', baseURL, error.message);
+      return Promise.reject(new Error('Network error: Please check backend server and API URL')); 
+    }
+
+    const message = error.response.data?.message || error.message || 'Something went wrong';
+    if (error.response.status === 401) {
       localStorage.removeItem('token');
     }
     return Promise.reject(new Error(message));

@@ -92,6 +92,71 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
+// Admin: Get all partners
+exports.getAllPartners = async (req, res) => {
+    try {
+        const { status, search } = req.query;
+        const query = {};
+
+        if (status) {
+            query.status = status;
+        }
+
+        if (search) {
+            query.name = { $regex: search, $options: 'i' };
+        }
+
+        const partners = await DeliveryPartner.find(query).sort({ createdAt: -1 });
+        return sendResponse(res, 200, 'Partners fetched', partners);
+    } catch (error) {
+        return sendError(res, 500, error.message);
+    }
+};
+
+// Admin: Create partner
+exports.createPartner = async (req, res) => {
+    try {
+        const { name, email, phone, city, vehicleType, licenseNumber } = req.body;
+
+        if (!name || !email || !phone || !city || !vehicleType || !licenseNumber) {
+            return sendError(res, 400, 'Please provide all details');
+        }
+
+        const existingPartner = await DeliveryPartner.findOne({ $or: [{ phone }, { email }] });
+        if (existingPartner) {
+            return sendError(res, 400, 'Delivery partner already exists');
+        }
+
+        const partner = await DeliveryPartner.create({
+            name,
+            email,
+            phone,
+            city,
+            vehicleType,
+            documents: { license: licenseNumber },
+            isVerified: true,
+            status: 'Active'
+        });
+
+        return sendResponse(res, 201, 'Partner created', partner);
+    } catch (error) {
+        return sendError(res, 500, error.message);
+    }
+};
+
+// Admin: Update partner by ID
+exports.updatePartner = async (req, res) => {
+    try {
+        const partner = await DeliveryPartner.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!partner) {
+            return sendError(res, 404, 'Delivery partner not found');
+        }
+        return sendResponse(res, 200, 'Partner updated', partner);
+    } catch (error) {
+        return sendError(res, 500, error.message);
+    }
+};
+
 // Accept Order
 exports.acceptOrder = async (req, res) => {
     try {

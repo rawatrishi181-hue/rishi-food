@@ -62,13 +62,13 @@ const Profile = () => {
   return (
     <div className="max-w-4xl mx-auto pb-20 animate-fadeIn px-4 sm:px-0">
       <div className="flex items-center gap-4 mb-8 sm:mb-10">
-        <h1 className="text-3xl sm:text-4xl font-black text-gray-800 italic tracking-tight">My Profile</h1>
+        <h1 className="text-3xl sm:text-4xl font-black text-gray-800 dark:text-gray-100 italic tracking-tight">My Profile</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
         {/* Profile Sidebar */}
         <div className="md:col-span-1">
-          <div className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[32px] shadow-xl border border-gray-50 flex flex-col items-center text-center">
+          <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl sm:rounded-[32px] shadow-xl border border-gray-50 dark:border-gray-700 flex flex-col items-center text-center">
             <div className="relative group cursor-pointer" onClick={() => document.getElementById('profileImageInput').click()}>
               <div className="w-24 h-24 sm:w-32 sm:h-32 bg-primary/10 rounded-full flex items-center justify-center mb-4 sm:mb-6 border-4 border-white shadow-lg overflow-hidden transition-all duration-300 group-hover:opacity-80">
                 {formData.profileImage ? (
@@ -88,15 +88,15 @@ const Profile = () => {
                 onChange={handleImageChange} 
               />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-gray-800">{user.name}</h3>
-            <p className="text-[10px] sm:text-sm text-gray-400 font-medium uppercase tracking-widest mt-1">{user.role}</p>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100">{user.name}</h3>
+            <p className="text-[10px] sm:text-sm text-gray-400 dark:text-gray-500 font-medium uppercase tracking-widest mt-1">{user.role}</p>
             
-            <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-50 w-full space-y-3 sm:space-y-4">
-              <div className="flex items-center justify-center sm:justify-start gap-3 text-xs sm:text-sm text-gray-500">
+            <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-50 dark:border-gray-700 w-full space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-center sm:justify-start gap-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 <Mail className="w-4 h-4 text-primary shrink-0" />
                 <span className="truncate">{user.email}</span>
               </div>
-              <div className="flex items-center justify-center sm:justify-start gap-3 text-xs sm:text-sm text-gray-500">
+              <div className="flex items-center justify-center sm:justify-start gap-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 <Phone className="w-4 h-4 text-primary shrink-0" />
                 <span>{user.phone || 'No phone set'}</span>
               </div>
@@ -106,8 +106,8 @@ const Profile = () => {
 
         {/* Update Form */}
         <div className="md:col-span-2">
-          <div className="bg-white p-6 sm:p-10 rounded-2xl sm:rounded-[40px] shadow-2xl border border-gray-100">
-            <h3 className="text-xl sm:text-2xl font-black text-gray-800 mb-6 sm:mb-8 italic flex items-center gap-3">
+          <div className="bg-white dark:bg-gray-800 p-6 sm:p-10 rounded-2xl sm:rounded-[40px] shadow-2xl border border-gray-100 dark:border-gray-700">
+            <h3 className="text-xl sm:text-2xl font-black text-gray-800 dark:text-gray-100 mb-6 sm:mb-8 italic flex items-center gap-3">
               <Save className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               Edit Account Info
             </h3>
@@ -115,12 +115,12 @@ const Profile = () => {
             <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Full Name</label>
+                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Full Name</label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                     <input 
                       type="text"
-                      className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-100 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white transition-all font-medium text-gray-700 text-sm"
+                      className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 border border-gray-100 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-700 transition-all font-medium text-gray-700 text-sm"
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                       required
@@ -128,12 +128,12 @@ const Profile = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Email Address</label>
+                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                     <input 
                       type="email"
-                      className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-100 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white transition-all font-medium text-gray-700 disabled:opacity-50 text-sm"
+                      className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 border border-gray-100 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-700 transition-all font-medium text-gray-700 disabled:opacity-50 text-sm"
                       value={formData.email}
                       disabled
                     />
@@ -142,12 +142,12 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Phone Number</label>
+                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Phone Number</label>
                 <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                   <input 
                     type="tel"
-                    className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-100 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white transition-all font-medium text-gray-700 text-sm"
+                    className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 border border-gray-100 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-700 transition-all font-medium text-gray-700 text-sm"
                     placeholder="Enter your phone number"
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
@@ -156,17 +156,17 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Delivery Address</label>
+                <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">Delivery Address</label>
                 <div className="relative">
-                  <MapPin className="absolute left-4 top-4 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+                  <MapPin className="absolute left-4 top-4 text-gray-400 dark:text-gray-500 w-4 h-4 sm:w-5 sm:h-5" />
                   <textarea 
-                    className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-100 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white transition-all font-medium text-gray-700 min-h-[100px] text-sm"
+                    className="w-full pl-11 sm:pl-12 pr-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 border border-gray-100 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-gray-700 transition-all font-medium text-gray-700 min-h-[100px] text-sm"
                     placeholder="Enter your complete address for faster delivery"
                     value={formData.address}
                     onChange={(e) => setFormData({...formData, address: e.target.value})}
                   />
                 </div>
-                <p className="mt-2 text-[9px] sm:text-[10px] text-gray-400 font-medium italic">
+                <p className="mt-2 text-[9px] sm:text-[10px] text-gray-400 dark:text-gray-500 font-medium italic">
                   * Providing an accurate address helps our riders reach you faster.
                 </p>
               </div>

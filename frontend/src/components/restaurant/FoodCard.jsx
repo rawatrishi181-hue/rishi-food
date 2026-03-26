@@ -9,7 +9,7 @@ export const FoodCard = ({ food, onAddToCart }) => {
   const rating = food.rating || (Math.random() * (5 - 3.5) + 3.5).toFixed(1);
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden card-shadow card-hover border border-gray-100 flex flex-col h-full group">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden card-shadow card-hover border border-gray-100 dark:border-gray-700 flex flex-col h-full group">
       {/* Image Container */}
       <div className="relative h-48 overflow-hidden">
         <img
@@ -52,7 +52,7 @@ export const FoodCard = ({ food, onAddToCart }) => {
       {/* Content */}
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-1">
-          <h3 className="text-lg font-bold text-gray-800 line-clamp-1 group-hover:text-primary transition-colors">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 line-clamp-1 group-hover:text-primary transition-colors">
             {food.name}
           </h3>
           <div className="flex items-center gap-1 bg-green-700 text-white px-1.5 py-0.5 rounded text-xs font-bold shrink-0">
@@ -60,16 +60,16 @@ export const FoodCard = ({ food, onAddToCart }) => {
           </div>
         </div>
 
-        <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-grow">
+        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-4 flex-grow">
           {food.description || "Freshly prepared with the finest ingredients to satisfy your cravings."}
         </p>
 
         <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-50">
           <div className="flex flex-col">
-            <span className="text-xs text-gray-400 font-medium line-through">
+            <span className="text-xs text-gray-400 dark:text-gray-500 font-medium line-through">
               ₹{Math.round(food.price * 1.2)}
             </span>
-            <span className="text-xl font-bold text-gray-900">
+            <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
               ₹{food.price}
             </span>
           </div>

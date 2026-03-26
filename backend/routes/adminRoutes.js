@@ -24,6 +24,7 @@ router.get('/stats', getStats);
 router.get('/sales', getSalesData);
 router.get('/orders-distribution', getOrderDistribution);
 router.get('/dashboard', getDashboardStats);
+router.get('/revenue', getRevenueAnalytics);
 router.get('/analytics', getDetailedAnalytics);
 
 router.get('/recent-orders', async (req, res) => {

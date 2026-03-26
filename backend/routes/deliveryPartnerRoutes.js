@@ -6,7 +6,10 @@ const {
     getDashboard, 
     updateProfile, 
     acceptOrder, 
-    completeDelivery 
+    completeDelivery,
+    getAllPartners,
+    createPartner,
+    updatePartner
 } = require('../controllers/deliveryPartnerController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -19,5 +22,11 @@ router.get('/dashboard', protect, getDashboard);
 router.put('/profile', protect, updateProfile);
 router.post('/orders/accept', protect, acceptOrder);
 router.post('/orders/complete', protect, completeDelivery);
+
+// Admin management of partners
+const { authorize } = require('../middleware/authMiddleware');
+router.get('/', protect, authorize('admin'), getAllPartners);
+router.post('/', protect, authorize('admin'), createPartner);
+router.put('/:id', protect, authorize('admin'), updatePartner);
 
 module.exports = router;

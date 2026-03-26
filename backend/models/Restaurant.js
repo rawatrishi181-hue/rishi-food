@@ -39,6 +39,12 @@ const restaurantSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    commissionPercentage: {
+        type: Number,
+        default: 10, // Default 10% commission
+        min: 0,
+        max: 100
     }
 }, {
     timestamps: true

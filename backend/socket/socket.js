@@ -100,9 +100,23 @@ const emitNewOrder = (order) => {
     }
 };
 
+/**
+ * Emit commission update to vendor and admin
+ * @param {string} vendorId - ID of the vendor (restaurant owner)
+ * @param {Object} data - Commission data
+ */
+const emitCommissionUpdate = (vendorId, data) => {
+    if (io) {
+        io.to(vendorId.toString()).emit('commission_update', data);
+        io.to('admin_room').emit('admin_commission_update', data);
+        console.log(`Emitted commission update to vendor ${vendorId} and admin`);
+    }
+};
+
 module.exports = {
     initSocket,
     getIO,
     emitOrderStatusUpdate,
-    emitNewOrder
+    emitNewOrder,
+    emitCommissionUpdate
 };

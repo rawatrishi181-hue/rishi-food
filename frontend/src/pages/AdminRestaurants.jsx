@@ -4,7 +4,7 @@ import { AdminLayout } from '../components/admin/AdminLayout';
 import { Button } from '../components/common/Button';
 import { 
   Plus, Search, Edit2, Trash2, MapPin, 
-  Star, Clock, Utensils, X, Image as ImageIcon
+  Star, Clock, Utensils, X, Image as ImageIcon, DollarSign
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -15,9 +15,11 @@ const AdminRestaurants = () => {
   const [showModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '', description: '', address: '', city: '', 
-    cuisine: '', deliveryTime: 30, image: '', rating: 4.5
+    cuisine: '', deliveryTime: 30, image: '', rating: 4.5, commissionPercentage: 10
   });
   const [editingId, setEditingId] = useState(null);
+  const [showCommissionModal, setShowCommissionModal] = useState(false);
+  const [commissionData, setCommissionData] = useState({ id: '', percentage: 10 });
 
   useEffect(() => {
     fetchRestaurants();
@@ -69,7 +71,8 @@ const AdminRestaurants = () => {
       cuisine: rest.cuisine.join(', '),
       deliveryTime: rest.deliveryTime,
       image: rest.image,
-      rating: rest.rating
+      rating: rest.rating,
+      commissionPercentage: rest.commissionPercentage || 10
     });
     setEditingId(rest._id);
     setShowAddModal(true);
@@ -86,6 +89,23 @@ const AdminRestaurants = () => {
     }
   };
 
+  const handleCommissionUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await restaurantService.updateCommission(commissionData.id, commissionData.percentage);
+      toast.success('Commission updated successfully');
+      setShowCommissionModal(false);
+      fetchRestaurants();
+    } catch (error) {
+      toast.error('Failed to update commission');
+    }
+  };
+
+  const openCommissionModal = (rest) => {
+    setCommissionData({ id: rest._id, percentage: rest.commissionPercentage || 10 });
+    setShowCommissionModal(true);
+  };
+
   const filteredRestaurants = restaurants.filter(r => 
     r.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -98,7 +118,7 @@ const AdminRestaurants = () => {
             <h1 className="text-4xl font-black text-gray-800 italic tracking-tight mb-2">Manage <span className="text-primary">Restaurants</span></h1>
             <p className="text-gray-500 font-medium italic">Add, edit or remove restaurant partners.</p>
           </div>
-          <Button onClick={() => { setEditingId(null); setFormData({ name: '', description: '', address: '', city: '', cuisine: '', deliveryTime: 30, image: '', rating: 4.5 }); setShowAddModal(true); }} className="gap-2 px-8 py-4 rounded-2xl shadow-xl shadow-primary/20">
+          <Button onClick={() => { setEditingId(null); setFormData({ name: '', description: '', address: '', city: '', cuisine: '', deliveryTime: 30, image: '', rating: 4.5, commissionPercentage: 10 }); setShowAddModal(true); }} className="gap-2 px-8 py-4 rounded-2xl shadow-xl shadow-primary/20">
             <Plus className="w-5 h-5" /> Add Restaurant
           </Button>
         </div>
@@ -170,6 +190,19 @@ const AdminRestaurants = () => {
                   />
                 </div>
 
+                <div>
+                  <label className="block text-sm font-black text-gray-700 uppercase tracking-widest mb-2">Commission (%)</label>
+                  <input 
+                    required
+                    type="number" 
+                    min="0"
+                    max="100"
+                    className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-primary font-medium"
+                    value={formData.commissionPercentage}
+                    onChange={(e) => setFormData({...formData, commissionPercentage: e.target.value})}
+                  />
+                </div>
+
                 <div className="col-span-2">
                   <label className="block text-sm font-black text-gray-700 uppercase tracking-widest mb-2">Cuisine (comma separated)</label>
                   <input 
@@ -220,6 +253,48 @@ const AdminRestaurants = () => {
           </div>
         )}
 
+        {/* Commission Modal */}
+        {showCommissionModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-[40px] w-full max-w-md overflow-hidden shadow-2xl animate-fadeIn">
+              <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                <h2 className="text-2xl font-black text-gray-800 italic">Update <span className="text-primary">Commission</span></h2>
+                <button onClick={() => setShowCommissionModal(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                  <X className="w-6 h-6 text-gray-400" />
+                </button>
+              </div>
+              
+              <form onSubmit={handleCommissionUpdate} className="p-8">
+                <div className="mb-6">
+                  <label className="block text-sm font-black text-gray-700 uppercase tracking-widest mb-2">Commission Percentage</label>
+                  <input 
+                    required
+                    type="number" 
+                    min="0"
+                    max="100"
+                    className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-primary font-medium"
+                    value={commissionData.percentage}
+                    onChange={(e) => setCommissionData({...commissionData, percentage: e.target.value})}
+                  />
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <Button type="submit" className="flex-grow py-4 rounded-2xl shadow-xl shadow-primary/20">
+                    Update Commission
+                  </Button>
+                  <button 
+                    type="button"
+                    onClick={() => setShowCommissionModal(false)}
+                    className="px-6 py-4 bg-gray-100 text-gray-500 font-black uppercase tracking-widest rounded-2xl hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         {/* Table/Grid */}
         {loading ? (
           <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div></div>
@@ -249,12 +324,16 @@ const AdminRestaurants = () => {
                     <div className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {rest.city}</div>
                     <div className="flex items-center gap-1"><Clock className="w-4 h-4" /> {rest.deliveryTime} mins</div>
                     <div className="flex items-center gap-1"><Utensils className="w-4 h-4" /> {rest.cuisine?.join(', ')}</div>
+                    <div className="flex items-center gap-1 text-primary">💰 {rest.commissionPercentage || 10}% Commission</div>
                   </div>
                 </div>
 
                 <div className="flex gap-2">
                   <button onClick={() => handleEdit(rest)} className="p-4 bg-gray-50 text-gray-400 rounded-2xl hover:bg-primary/5 hover:text-primary transition-all">
                     <Edit2 className="w-5 h-5" />
+                  </button>
+                  <button onClick={() => openCommissionModal(rest)} className="p-4 bg-gray-50 text-gray-400 rounded-2xl hover:bg-green-50 hover:text-green-600 transition-all">
+                    <DollarSign className="w-5 h-5" />
                   </button>
                   <button onClick={() => handleDelete(rest._id)} className="p-4 bg-gray-50 text-gray-400 rounded-2xl hover:bg-red-50 hover:text-red-500 transition-all">
                     <Trash2 className="w-5 h-5" />

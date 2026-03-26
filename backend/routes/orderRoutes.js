@@ -3,6 +3,7 @@ const { check } = require('express-validator');
 const {
     createOrder,
     getMyOrders,
+    getVendorOrders,
     getOrderDetails,
     updateOrderStatus,
     cancelOrder
@@ -64,6 +65,8 @@ router
         createOrder
     )
     .get(protect, getMyOrders);
+
+router.get('/vendor', protect, authorize('restaurant', 'admin'), getVendorOrders);
 
 /**
  * @swagger

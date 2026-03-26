@@ -304,16 +304,22 @@ const getStats = async (req, res) => {
  */
 const getSalesData = async (req, res) => {
     try {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 29);
+        startDate.setHours(0,0,0,0);
+        endDate.setHours(23,59,59,999);
+
         const sales = await Order.aggregate([
             {
                 $match: {
                     status: 'delivered',
-                    createdAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 7)) }
+                    createdAt: { $gte: startDate, $lte: endDate }
                 }
             },
             {
                 $group: {
-                    _id: { $dayOfWeek: '$createdAt' },
+                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
                     sales: { $sum: 1 },
                     revenue: { $sum: '$totalAmount' }
                 }
@@ -321,12 +327,20 @@ const getSalesData = async (req, res) => {
             { $sort: { '_id': 1 } }
         ]);
 
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const formattedSales = sales.map(item => ({
-            day: days[item._id - 1],
-            sales: item.sales,
-            revenue: item.revenue
-        }));
+        const salesMap = sales.reduce((acc, item) => {
+            acc[item._id] = { sales: item.sales, revenue: item.revenue };
+            return acc;
+        }, {});
+
+        const formattedSales = [];
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const isoDay = d.toISOString().split('T')[0];
+            formattedSales.push({
+                day: `${d.getDate()}/${d.getMonth() + 1}`,
+                sales: salesMap[isoDay]?.sales || 0,
+                revenue: salesMap[isoDay]?.revenue || 0
+            });
+        }
 
         return sendResponse(res, 200, 'Sales data fetched successfully', formattedSales);
     } catch (error) {
@@ -341,8 +355,19 @@ const getSalesData = async (req, res) => {
  */
 const getOrderDistribution = async (req, res) => {
     try {
-        const distribution = await Order.aggregate([
-            { $match: { status: 'delivered' } },
+        // Primary chart: distribution by order status (placed/accepted/preparing/out_for_delivery/delivered/cancelled)
+        const statusDistribution = await Order.aggregate([
+            {
+                $group: {
+                    _id: '$status',
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { count: -1 } }
+        ]);
+
+        // As fallback, include food category distribution (veg/nonveg or category names)
+        const categoryDistribution = await Order.aggregate([
             { $unwind: '$items' },
             {
                 $lookup: {
@@ -358,12 +383,14 @@ const getOrderDistribution = async (req, res) => {
                     _id: '$foodDetails.category',
                     count: { $sum: 1 }
                 }
-            }
+            },
+            { $sort: { count: -1 } }
         ]);
 
-        // Fallback simple logic if food details lookup is complex
-        // Let's just use category for now as proxy for distribution
-        return sendResponse(res, 200, 'Distribution fetched successfully', distribution);
+        // Prioritize status distribution for order-type semantics
+        const distributionData = statusDistribution.length > 0 ? statusDistribution : categoryDistribution;
+
+        return sendResponse(res, 200, 'Distribution fetched successfully', distributionData);
     } catch (error) {
         return sendError(res, 500, error.message);
     }

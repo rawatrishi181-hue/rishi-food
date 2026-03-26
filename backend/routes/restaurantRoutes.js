@@ -3,9 +3,11 @@ const { check } = require('express-validator');
 const {
     getRestaurants,
     getRestaurant,
+    getMyRestaurant,
     createRestaurant,
     updateRestaurant,
-    deleteRestaurant
+    deleteRestaurant,
+    updateCommission
 } = require('../controllers/restaurantController');
 const { getRestaurantMenu } = require('../controllers/foodController');
 const { getRestaurantReviews } = require('../controllers/reviewController');
@@ -142,6 +144,8 @@ router
         createRestaurant
     );
 
+router.get('/me', protect, authorize('restaurant', 'admin'), getMyRestaurant);
+
 /**
  * @swagger
  * /restaurants/{id}:
@@ -191,5 +195,7 @@ router
     .get(getRestaurant)
     .put(protect, authorize('admin'), updateRestaurant)
     .delete(protect, authorize('admin'), deleteRestaurant);
+
+router.put('/:id/commission', protect, authorize('admin'), updateCommission);
 
 module.exports = router;

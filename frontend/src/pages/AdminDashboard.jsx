@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, Users, ShoppingBag, DollarSign, 
-  CheckCircle, XCircle, Clock, Search, Bell, User
+  CheckCircle, XCircle, Clock, Search, Bell, User, Utensils
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AdminLayout } from '../components/admin/AdminLayout';
@@ -20,6 +20,8 @@ const AdminDashboard = () => {
   });
   const [salesData, setSalesData] = useState([]);
   const [distributionData, setDistributionData] = useState([]);
+  const [revenueTrendData, setRevenueTrendData] = useState([]);
+  const [topFoods, setTopFoods] = useState([]);
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -65,6 +67,20 @@ const AdminDashboard = () => {
         setRecentOrders(ordersRes.data);
       }
 
+      const topFoodsRes = await adminService.getTopFoods();
+      if (topFoodsRes && topFoodsRes.data) {
+        setTopFoods(topFoodsRes.data || []);
+      }
+
+      const revenueRes = await adminService.getRevenueTrend();
+      if (revenueRes && revenueRes.data) {
+        setRevenueTrendData(revenueRes.data.map(item => ({
+          month: `${item._id.month}/${item._id.year}`,
+          totalRevenue: item.totalRevenue,
+          orderCount: item.orderCount
+        })));
+      }
+
     } catch (error) {
       console.error('Error fetching admin data:', error);
       toast.error('Failed to load dashboard statistics');
@@ -108,22 +124,28 @@ const AdminDashboard = () => {
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 mb-12">
           <div className="xl:col-span-2 bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[40px] shadow-2xl border border-gray-100">
             <h3 className="text-xl font-black text-gray-800 mb-8 italic flex items-center gap-3">
               <TrendingUp className="w-6 h-6 text-primary" />
               Sales Performance
             </h3>
             <div className="h-[300px] sm:h-[400px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={salesData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="_id" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }} />
-                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }} />
-                  <Line type="monotone" dataKey="revenue" stroke="#FF3008" strokeWidth={4} dot={{ r: 6, fill: '#FF3008', strokeWidth: 3, stroke: '#fff' }} activeDot={{ r: 8, strokeWidth: 0 }} />
-                </LineChart>
-              </ResponsiveContainer>
+              {salesData.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-gray-500 font-bold">Koi sales data nahi mila (pichle 30 din mein)</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={salesData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }} />
+                    <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }} />
+                    <Legend verticalAlign="top" height={36} />
+                    <Line type="monotone" dataKey="sales" name="Orders" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="revenue" name="Revenue" stroke="#FF3008" strokeWidth={3} dot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
@@ -133,18 +155,85 @@ const AdminDashboard = () => {
               Order Types
             </h3>
             <div className="h-[300px] sm:h-[350px] w-full">
+              {distributionData.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-gray-500 font-bold">Koi order type data nahi mila</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={distributionData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={8} dataKey="value">
+                      {distributionData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }} />
+                    <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontWeight: 600, fontSize: '12px' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-[40px] shadow-2xl border border-gray-100">
+            <h3 className="text-xl font-black text-gray-800 mb-8 italic flex items-center gap-3">
+              <DollarSign className="w-6 h-6 text-primary" />
+              Monthly Revenue
+            </h3>
+            <div className="h-[300px] sm:h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={distributionData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={8} dataKey="value">
-                    {distributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }} />
-                  <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontWeight: 600, fontSize: '12px' }} />
-                </PieChart>
+                <BarChart data={revenueTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }} />
+                  <Tooltip formatter={(value) => [`₹${value}`, 'Revenue']} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }} />
+                  <Legend />
+                  <Bar dataKey="totalRevenue" name="Revenue" fill="#14b8a6" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="orderCount" name="Orders" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                </BarChart>
               </ResponsiveContainer>
             </div>
+          </div>
+        </div>
+
+        {/* Top Foods Chart */}
+        <div className="mb-12">
+          <h3 className="text-xl font-black text-gray-800 mb-6 italic flex items-center gap-3">
+            <Utensils className="w-6 h-6 text-primary" />
+            Top Foods Chart (Popularity)
+          </h3>
+          <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+            {topFoods.length === 0 ? (
+              <div className="h-60 flex items-center justify-center text-gray-500 font-bold">No top food data available</div>
+            ) : (
+              <div className="h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={topFoods.map((food, index) => ({ name: food.name || `Item ${index+1}`, totalSold: food.totalSold || 0 }))}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }} />
+                    <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }} />
+                    <Bar dataKey="totalSold" fill="#2563eb" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Top Food Cards */}
+        <div className="mb-12">
+          <h3 className="text-xl font-black text-gray-800 mb-6 italic flex items-center gap-3">
+            <Utensils className="w-6 h-6 text-primary" />
+            Top Selling Foods
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(topFoods.length ? topFoods : [{ _id:'none', name:'No Data', totalSold: 0, totalRevenue: 0 }]).map((item, idx) => (
+               <div key={item._id || idx} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-lg hover:shadow-2xl transition-all">
+                 <h4 className="text-lg font-black text-gray-800 mb-2 truncate">{item.name || 'No food name'}</h4>
+                 <p className="text-xs text-gray-500 mb-4">Sold: <span className="font-black">{item.totalSold ?? 0}</span></p>
+                 <p className="text-gray-600">Revenue: <span className="font-black">₹{item.totalRevenue ?? 0}</span></p>
+                 <div className="mt-4 py-2 px-3 bg-gray-50 text-xs font-black uppercase tracking-widest rounded-full text-primary">Rank {idx + 1}</div>
+               </div>
+            ))}
           </div>
         </div>
 

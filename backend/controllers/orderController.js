@@ -6,7 +6,7 @@ const { sendResponse, sendError } = require('../utils/responseHandler');
 const { validationResult } = require('express-validator');
 const { sendInternalNotification } = require('./notificationController');
 const { sendEmail } = require('../utils/mail.service');
-const { emitOrderStatusUpdate, emitNewOrder } = require('../socket/socket');
+const { emitOrderStatusUpdate, emitNewOrder, emitCommissionUpdate } = require('../socket/socket');
 
 // Import Email Templates
 const orderPlacedTemplate = require('../templates/emails/orderPlaced.template');
@@ -57,16 +57,26 @@ const createOrder = async (req, res) => {
         // 1. Fetch user's cart and populate food to get restaurantIds
         const cart = await Cart.findOne({ userId }).populate('items.foodId');
 
-        if (!cart || cart.items.length === 0) {
+        if (!cart || !cart.items || cart.items.length === 0) {
             return sendError(res, 400, 'Your cart is empty');
+        }
+
+        // Filter invalid cart items (missing food or missing restaurant)
+        const validItems = cart.items.filter(item => {
+            const food = item.foodId;
+            return food && food.restaurantId;
+        });
+
+        if (validItems.length === 0) {
+            return sendError(res, 400, 'Your cart has no valid items');
         }
 
         // Fetch user details for email
         const user = await User.findById(userId);
-        
+
         // Group items by restaurantId
         const itemsByRestaurant = {};
-        for (const item of cart.items) {
+        for (const item of validItems) {
             const restId = item.foodId.restaurantId.toString();
             if (!itemsByRestaurant[restId]) {
                 itemsByRestaurant[restId] = {
@@ -159,6 +169,35 @@ const getMyOrders = async (req, res) => {
 };
 
 /**
+ * @desc    Get all orders for the restaurant vendor
+ * @route   GET /orders/vendor
+ * @access  Private (Restaurant Owner, Admin)
+ */
+const getVendorOrders = async (req, res) => {
+    try {
+        if (req.user.role === 'admin') {
+            const orders = await Order.find().populate('restaurantId', 'name city').populate('userId', 'name email').sort('-createdAt');
+            return sendResponse(res, 200, 'Vendor orders fetched successfully', orders);
+        }
+
+        const restaurant = await Restaurant.findOne({ ownerId: req.user._id });
+        if (!restaurant) {
+            return sendError(res, 404, 'Restaurant not found for this vendor');
+        }
+
+        const orders = await Order.find({ restaurantId: restaurant._id })
+            .populate('restaurantId', 'name city')
+            .populate('userId', 'name email')
+            .sort('-createdAt');
+
+        return sendResponse(res, 200, 'Vendor orders fetched successfully', orders);
+    } catch (error) {
+        console.error(error);
+        return sendError(res, 500, 'Server error');
+    }
+};
+
+/**
  * @desc    Get order details by order ID
  * @route   GET /orders/:id
  * @access  Private
@@ -224,6 +263,20 @@ const updateOrderStatus = async (req, res) => {
         }
 
         order.status = status;
+
+        // Calculate commission when order is delivered
+        if (status === 'delivered') {
+            const commissionRate = restaurant.commissionPercentage || 10; // Default 10%
+            order.commissionAmount = (order.totalAmount * commissionRate) / 100;
+            // Emit commission update to vendor
+            emitCommissionUpdate(restaurant.ownerId, {
+                orderId: order._id,
+                commissionAmount: order.commissionAmount,
+                totalAmount: order.totalAmount,
+                commissionRate
+            });
+        }
+
         await order.save();
 
         // Fetch User and Restaurant for email
@@ -343,6 +396,7 @@ const cancelOrder = async (req, res) => {
 module.exports = {
     createOrder,
     getMyOrders,
+    getVendorOrders,
     getOrderDetails,
     updateOrderStatus,
     cancelOrder

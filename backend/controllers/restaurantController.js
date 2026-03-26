@@ -149,6 +149,21 @@ const updateRestaurant = async (req, res) => {
  * @route   DELETE /restaurants/:id
  * @access  Private/Admin
  */
+const getMyRestaurant = async (req, res) => {
+    try {
+        const restaurant = await Restaurant.findOne({ ownerId: req.user._id });
+
+        if (!restaurant) {
+            return sendError(res, 404, 'Restaurant profile not found for current vendor');
+        }
+
+        return sendResponse(res, 200, 'Vendor restaurant profile fetched successfully', restaurant);
+    } catch (error) {
+        console.error(error);
+        return sendError(res, 500, 'Server error');
+    }
+};
+
 const deleteRestaurant = async (req, res) => {
     try {
         const restaurant = await Restaurant.findById(req.params.id);
@@ -166,10 +181,41 @@ const deleteRestaurant = async (req, res) => {
     }
 };
 
+/**
+ * @desc    Update restaurant commission
+ * @route   PUT /restaurants/:id/commission
+ * @access  Private/Admin
+ */
+const updateCommission = async (req, res) => {
+    try {
+        const { commissionPercentage } = req.body;
+
+        if (commissionPercentage < 0 || commissionPercentage > 100) {
+            return sendError(res, 400, 'Commission percentage must be between 0 and 100');
+        }
+
+        const restaurant = await Restaurant.findById(req.params.id);
+
+        if (!restaurant) {
+            return sendError(res, 404, `Restaurant not found with id of ${req.params.id}`);
+        }
+
+        restaurant.commissionPercentage = commissionPercentage;
+        await restaurant.save();
+
+        return sendResponse(res, 200, 'Commission updated successfully', restaurant);
+    } catch (error) {
+        console.error(error);
+        return sendError(res, 500, 'Server error');
+    }
+};
+
 module.exports = {
     getRestaurants,
     getRestaurant,
+    getMyRestaurant,
     createRestaurant,
     updateRestaurant,
-    deleteRestaurant
+    deleteRestaurant,
+    updateCommission
 };
