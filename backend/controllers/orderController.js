@@ -27,12 +27,31 @@ const getAllOrders = async (req, res) => {
             return sendError(res, 403, 'Not authorized');
         }
 
+        const { page = 1, limit = 20 } = req.query;
+        const pageNum = parseInt(page, 10);
+        const limitNum = parseInt(limit, 10);
+        const startIndex = (pageNum - 1) * limitNum;
+
+        const total = await Order.countDocuments();
+
         const orders = await Order.find()
             .populate('userId', 'name email')
             .populate('restaurantId', 'name city')
-            .sort('-createdAt');
+            .sort('-createdAt')
+            .skip(startIndex)
+            .limit(limitNum)
+            .lean();
 
-        return sendResponse(res, 200, 'All orders fetched successfully', orders);
+        return sendResponse(res, 200, 'All orders fetched successfully', {
+            count: orders.length,
+            total,
+            pagination: {
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(total / limitNum)
+            },
+            data: orders
+        });
     } catch (error) {
         console.error(error);
         return sendError(res, 500, 'Server error');
@@ -95,6 +114,14 @@ const createOrder = async (req, res) => {
 
         const createdOrders = [];
 
+        // OPTIMIZATION: Fetch all restaurants at once (avoid N+1 queries)
+        const restaurantIds = Object.keys(itemsByRestaurant);
+        const restaurants = await Restaurant.find({ _id: { $in: restaurantIds } }).lean();
+        const restaurantMap = {};
+        restaurants.forEach(r => {
+            restaurantMap[r._id.toString()] = r;
+        });
+
         // 2. Create orders for each restaurant
         for (const restId in itemsByRestaurant) {
             const group = itemsByRestaurant[restId];
@@ -110,21 +137,22 @@ const createOrder = async (req, res) => {
 
             createdOrders.push(order);
 
-            const restaurant = await Restaurant.findById(restId);
+            const restaurant = restaurantMap[restId];
 
-            // 3. Send Notification & Email for each order
-            await sendInternalNotification(
+            // 3. Send Notification & Email for each order (async, non-blocking)
+            sendInternalNotification(
                 userId,
                 'Order Placed!',
                 `Your order from ${restaurant.name} of ₹${order.totalAmount} has been placed successfully.`
-            );
+            ).catch(err => console.error('Notification error:', err));
 
-            // Send Email
+            // Send Email (async, non-blocking)
             try {
                 const html = orderPlacedTemplate(user.name, order._id, restaurant.name, order.totalAmount);
-                await sendEmail(user.email, `Order Placed Successfully - ${restaurant.name}`, html);
+                sendEmail(user.email, `Order Placed Successfully - ${restaurant.name}`, html)
+                    .catch(err => console.error('Email send error:', err));
             } catch (mailError) {
-                console.error('Email failed to send but order was placed:', mailError);
+                console.error('Email template error:', mailError);
             }
 
             // Emit Socket Event for Real-Time Tracking

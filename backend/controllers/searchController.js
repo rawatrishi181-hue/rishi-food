@@ -19,14 +19,14 @@ const globalSearch = async (req, res) => {
                 { name: { $regex: q, $options: 'i' } },
                 { cuisine: { $regex: q, $options: 'i' } }
             ]
-        }).limit(5);
+        }).lean().limit(5);
 
         const foods = await Food.find({
             $or: [
                 { name: { $regex: q, $options: 'i' } },
                 { description: { $regex: q, $options: 'i' } }
             ]
-        }).limit(5);
+        }).lean().limit(5);
 
         return sendResponse(res, 200, 'Search results fetched', { restaurants, foods });
     } catch (error) {
@@ -47,7 +47,7 @@ const searchRestaurants = async (req, res) => {
                 { name: { $regex: q || '', $options: 'i' } },
                 { cuisine: { $regex: q || '', $options: 'i' } }
             ]
-        });
+        }).lean();
         return sendResponse(res, 200, 'Restaurants fetched successfully', restaurants);
     } catch (error) {
         return sendError(res, 500, error.message);
@@ -67,7 +67,7 @@ const searchFoods = async (req, res) => {
                 { name: { $regex: q || '', $options: 'i' } },
                 { description: { $regex: q || '', $options: 'i' } }
             ]
-        }).populate('restaurantId', 'name');
+        }).populate('restaurantId', 'name').lean();
         return sendResponse(res, 200, 'Foods fetched successfully', foods);
     } catch (error) {
         return sendError(res, 500, error.message);

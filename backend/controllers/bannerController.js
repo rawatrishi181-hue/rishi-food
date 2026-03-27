@@ -1,5 +1,6 @@
 const Banner = require('../models/Banner');
 const { sendResponse, sendError } = require('../utils/responseHandler');
+const { getCache, setCache, deleteCache, CACHE_KEYS, CACHE_TTL } = require('../utils/cache');
 
 /**
  * @desc    Get all active banners
@@ -8,7 +9,19 @@ const { sendResponse, sendError } = require('../utils/responseHandler');
  */
 const getBanners = async (req, res) => {
     try {
-        const banners = await Banner.find({ isActive: true }).sort('-priority -createdAt');
+        // Check cache
+        const cachedBanners = await getCache(CACHE_KEYS.BANNERS);
+        if (cachedBanners) {
+            return sendResponse(res, 200, 'Banners fetched successfully', cachedBanners);
+        }
+
+        const banners = await Banner.find({ isActive: true })
+            .sort('-priority -createdAt')
+            .lean();
+        
+        // Cache result (30 min TTL)
+        await setCache(CACHE_KEYS.BANNERS, banners, CACHE_TTL.BANNERS);
+        
         return sendResponse(res, 200, 'Banners fetched successfully', banners);
     } catch (error) {
         return sendError(res, 500, error.message);
@@ -23,6 +36,8 @@ const getBanners = async (req, res) => {
 const createBanner = async (req, res) => {
     try {
         const banner = await Banner.create(req.body);
+        // Clear cache
+        await deleteCache(CACHE_KEYS.BANNERS);
         return sendResponse(res, 201, 'Banner created successfully', banner);
     } catch (error) {
         return sendError(res, 500, error.message);
@@ -40,6 +55,8 @@ const deleteBanner = async (req, res) => {
         if (!banner) {
             return sendError(res, 404, 'Banner not found');
         }
+        // Clear cache
+        await deleteCache(CACHE_KEYS.BANNERS);
         return sendResponse(res, 200, 'Banner deleted successfully');
     } catch (error) {
         return sendError(res, 500, error.message);

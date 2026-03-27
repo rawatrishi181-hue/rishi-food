@@ -54,4 +54,9 @@ userSchema.methods.matchPassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Add indexes for faster queries
+// Note: email has unique: true which creates an index automatically
+userSchema.index({ role: 1 });
+userSchema.index({ phone: 1 });
+
 module.exports = mongoose.model('User', userSchema);

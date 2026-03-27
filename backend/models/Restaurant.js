@@ -57,4 +57,13 @@ restaurantSchema.pre('save', function() {
     }
 });
 
+// Add indexes for faster queries
+restaurantSchema.index({ name: 'text', description: 'text' });
+restaurantSchema.index({ city: 1 });
+restaurantSchema.index({ cuisine: 1 });
+restaurantSchema.index({ rating: -1 });
+restaurantSchema.index({ ownerId: 1 });
+restaurantSchema.index({ city: 1, rating: -1 });
+restaurantSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('Restaurant', restaurantSchema);

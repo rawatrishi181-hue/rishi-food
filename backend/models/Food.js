@@ -43,4 +43,11 @@ foodSchema.pre('save', function() {
     }
 });
 
+// Add indexes for faster queries
+foodSchema.index({ restaurantId: 1 });
+foodSchema.index({ category: 1 });
+foodSchema.index({ name: 'text', description: 'text' });
+foodSchema.index({ isAvailable: 1 });
+foodSchema.index({ restaurantId: 1, isAvailable: 1 });
+
 module.exports = mongoose.model('Food', foodSchema);

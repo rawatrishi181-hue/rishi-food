@@ -29,4 +29,10 @@ const deliveryPartnerSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Add indexes for faster queries
+// Note: email and phone have unique: true which creates indexes automatically
+deliveryPartnerSchema.index({ city: 1 });
+deliveryPartnerSchema.index({ status: 1 });
+deliveryPartnerSchema.index({ city: 1, isOnline: 1 });
+
 module.exports = mongoose.model('DeliveryPartner', deliveryPartnerSchema);

@@ -53,4 +53,8 @@ cartSchema.pre('save', function() {
     }
 });
 
+// Add indexes for faster queries
+// Note: userId has unique: true which creates an index automatically
+cartSchema.index({ restaurantId: 1 });
+
 module.exports = mongoose.model('Cart', cartSchema);

@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const compression = require('compression');
+const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./config/swagger');
 const authRoutes = require('./routes/authRoutes');
@@ -27,6 +29,10 @@ const { sendError } = require('./utils/responseHandler');
 const path = require('path');
 
 const app = express();
+
+// Performance Middlewares
+app.use(compression()); // Compress all responses
+app.use(helmet()); // Secure HTTP headers
 
 // Middlewares
 app.use(express.json({ limit: '10mb' }));

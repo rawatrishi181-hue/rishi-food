@@ -23,10 +23,12 @@ const protect = async (req, res, next) => {
         // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Check both User and DeliveryPartner models
-        let person = await User.findById(decoded.id);
+        // Check User first (most common case)
+        let person = await User.findById(decoded.id).select('-password').lean();
+        
         if (!person) {
-            person = await DeliveryPartner.findById(decoded.id);
+            // Check DeliveryPartner only if User not found
+            person = await DeliveryPartner.findById(decoded.id).lean();
         }
 
         if (!person) {
