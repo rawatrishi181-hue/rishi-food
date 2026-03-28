@@ -18,6 +18,9 @@ import Profile from './pages/Profile';
 import CategoryFoods from './pages/CategoryFoods';
 import DeliveryPartnerDashboard from './pages/DeliveryPartnerDashboard';
 import Orders from './pages/Orders';
+import Payment from './pages/Payment';
+import AdminTransactions from './pages/AdminTransactions';
+import UserTransactions from './pages/UserTransactions';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminOrders from './pages/AdminOrders';
 import Support from './pages/Support';
@@ -66,7 +69,9 @@ function App() {
                   <Route path="/restaurant/:id" element={<RestaurantDetails />} />
                   <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                   <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+                  <Route path="/payment/:orderId" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
                   <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                  <Route path="/profile/transactions" element={<ProtectedRoute><UserTransactions /></ProtectedRoute>} />
                   <Route path="/search" element={<SearchResults />} />
 
                   {/* Delivery Partner Routes */}
@@ -80,6 +85,7 @@ function App() {
                   <Route path="/delivery-partners" element={<ProtectedRoute adminOnly><DeliveryPartnerDashboard /></ProtectedRoute>} />
                   <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/admin/orders" element={<ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>} />
+                  <Route path="/admin/transactions" element={<ProtectedRoute adminOnly><AdminTransactions /></ProtectedRoute>} />
                   <Route path="/admin/restaurants" element={<ProtectedRoute adminOnly><AdminRestaurants /></ProtectedRoute>} />
                   <Route path="/admin/vendors" element={<ProtectedRoute adminOnly><AdminRestaurants /></ProtectedRoute>} />
                   <Route path="/admin/food" element={<ProtectedRoute adminOnly><AdminFood /></ProtectedRoute>} />

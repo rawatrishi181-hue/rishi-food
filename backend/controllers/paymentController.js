@@ -1,99 +1,138 @@
-const Payment = require('../models/Payment');
+const Transaction = require('../models/Transaction');
 const Order = require('../models/Order');
 const { sendResponse, sendError } = require('../utils/responseHandler');
 
 /**
- * @desc    Initialize a payment (Mock)
+ * @desc    Create Dummy Payment Transaction
  * @route   POST /api/payments/create
  * @access  Private
  */
-const createPayment = async (req, res) => {
+const createDummyPayment = async (req, res) => {
     try {
-        const { orderId, amount, paymentGateway = 'Razorpay' } = req.body;
+        const { orderId, amount, paymentMethod } = req.body;
         const userId = req.user._id;
 
+        // Verify order exists
         const order = await Order.findById(orderId);
         if (!order) {
             return sendError(res, 404, 'Order not found');
         }
 
-        // Mock Transaction ID
-        const transactionId = `txn_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        // Generate random transactionId (TXN + timestamp + random string)
+        const transactionId = `TXN${Date.now()}${Math.random().toString(36).substring(7).toUpperCase()}`;
 
-        const payment = await Payment.create({
+        // Randomly assign status (80% SUCCESS, 20% FAILED)
+        const status = Math.random() < 0.8 ? 'SUCCESS' : 'FAILED';
+
+        // Save transaction in DB
+        const transaction = await Transaction.create({
             userId,
             orderId,
-            transactionId,
             amount,
-            paymentGateway,
-            status: 'pending'
+            paymentMethod,
+            status,
+            transactionId
         });
 
-        // In a real scenario, you'd call Razorpay/Stripe API here to get a session/order ID
-        return sendResponse(res, 201, 'Payment initialized successfully', {
-            paymentId: payment._id,
-            transactionId,
-            amount,
-            currency: 'INR',
-            orderId
-        });
-    } catch (error) {
-        return sendError(res, 500, error.message);
-    }
-};
-
-/**
- * @desc    Verify a payment (Mock)
- * @route   POST /api/payments/verify
- * @access  Private
- */
-const verifyPayment = async (req, res) => {
-    try {
-        const { transactionId, status, gatewayResponse } = req.body;
-
-        const payment = await Payment.findOne({ transactionId });
-        if (!payment) {
-            return sendError(res, 404, 'Payment transaction not found');
-        }
-
-        payment.status = status === 'success' ? 'completed' : 'failed';
-        payment.gatewayResponse = gatewayResponse;
-        await payment.save();
-
-        // Update Order Status if payment success
-        if (payment.status === 'completed') {
-            await Order.findByIdAndUpdate(payment.orderId, {
+        // Update Order status based on payment result
+        if (status === 'SUCCESS') {
+            await Order.findByIdAndUpdate(orderId, {
                 paymentStatus: 'paid',
-                status: 'preparing' // Automatically move to preparing after payment
+                status: 'preparing'
+            });
+        } else {
+            await Order.findByIdAndUpdate(orderId, {
+                paymentStatus: 'failed'
             });
         }
 
-        return sendResponse(res, 200, `Payment ${payment.status}`, payment);
+        return sendResponse(res, 201, `Payment ${status}`, transaction);
     } catch (error) {
         return sendError(res, 500, error.message);
     }
 };
 
 /**
- * @desc    Get payment history
- * @route   GET /api/payments/history
+ * @desc    Get All Transactions (Admin)
+ * @route   GET /api/admin/transactions
+ * @access  Private/Admin
+ */
+const getAllTransactions = async (req, res) => {
+    try {
+        const { page = 1, limit = 10, search, status } = req.query;
+        
+        const query = {};
+        
+        if (search) {
+            query.$or = [
+                { transactionId: { $regex: search, $options: 'i' } },
+                { status: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        if (status && status !== 'ALL') {
+            query.status = status;
+        }
+
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: { createdAt: -1 },
+            populate: [
+                { path: 'userId', select: 'name email' },
+                { path: 'orderId', select: 'totalAmount status' }
+            ]
+        };
+
+        // Manual pagination since we are not using mongoose-paginate-v2
+        const skip = (options.page - 1) * options.limit;
+        const total = await Transaction.countDocuments(query);
+        const transactions = await Transaction.find(query)
+            .populate(options.populate)
+            .sort(options.sort)
+            .skip(skip)
+            .limit(options.limit);
+
+        return sendResponse(res, 200, 'Transactions fetched successfully', {
+            transactions,
+            pagination: {
+                total,
+                page: options.page,
+                limit: options.limit,
+                pages: Math.ceil(total / options.limit)
+            }
+        });
+    } catch (error) {
+        return sendError(res, 500, error.message);
+    }
+};
+
+/**
+ * @desc    Get User Transactions
+ * @route   GET /api/payments/user/:userId
  * @access  Private
  */
-const getPaymentHistory = async (req, res) => {
+const getUserTransactions = async (req, res) => {
     try {
-        const query = req.user.role === 'admin' ? {} : { userId: req.user._id };
-        const payments = await Payment.find(query)
-            .populate('orderId', 'totalAmount items createdAt')
+        const { userId } = req.params;
+
+        // Check if user is accessing their own transactions or is an admin
+        if (req.user._id.toString() !== userId && req.user.role !== 'admin') {
+            return sendError(res, 403, 'Not authorized to view these transactions');
+        }
+
+        const transactions = await Transaction.find({ userId })
+            .populate('orderId', 'totalAmount status createdAt')
             .sort('-createdAt');
 
-        return sendResponse(res, 200, 'Payment history fetched successfully', payments);
+        return sendResponse(res, 200, 'User transactions fetched successfully', transactions);
     } catch (error) {
         return sendError(res, 500, error.message);
     }
 };
 
 module.exports = {
-    createPayment,
-    verifyPayment,
-    getPaymentHistory
+    createDummyPayment,
+    getAllTransactions,
+    getUserTransactions
 };

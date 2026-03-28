@@ -73,16 +73,29 @@ const Cart = () => {
     try {
       const response = await orderService.create({
         address: user.address,
-        paymentMethod: 'COD' // Default for now
+        paymentMethod: 'ONLINE' // Set to ONLINE if we want to show payment page
       });
 
-      const apiSuccess = response?.success ?? false;
-      const orderData = response?.data ?? response;
+      console.log('Order Creation Response:', response);
 
-      if (apiSuccess || (orderData && (Array.isArray(orderData) ? orderData.length > 0 : orderData._id))) {
+      const apiSuccess = response?.success || false;
+      // Extract the order data correctly - response is { success, message, data }
+      const orderData = response?.data; 
+
+      if (apiSuccess && orderData) {
         toast.success('Order placed successfully!');
         await clearCart();
-        navigate('/orders');
+        
+        // Handle both single order and array of orders
+        const finalOrderId = Array.isArray(orderData) ? orderData[0]._id : orderData._id;
+        
+        if (finalOrderId) {
+          console.log('Navigating to payment for order:', finalOrderId);
+          navigate(`/payment/${finalOrderId}`);
+        } else {
+          console.error('No Order ID found in response:', orderData);
+          navigate('/orders');
+        }
         return;
       }
 

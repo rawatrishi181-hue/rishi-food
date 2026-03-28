@@ -37,11 +37,17 @@ export const orderService = {
   getMyOrders: () => api.get('/orders'),
   getById: (id) => api.get(`/orders/${id}`),
   cancel: (id) => api.put(`/orders/${id}/cancel`),
+  updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
 };
 
 export const categoryService = {
   getAll: () => api.get('/categories'),
   getFoods: (id) => api.get(`/categories/${id}/foods`),
+};
+
+export const paymentService = {
+  create: (data) => api.post('/payments/create', data),
+  getUserTransactions: (userId) => api.get(`/payments/user/${userId}`),
 };
 
 export const adminService = {
@@ -55,6 +61,7 @@ export const adminService = {
   getRevenueTrend: () => api.get('/admin/revenue'),
   getRecentOrders: () => api.get('/admin/recent-orders'),
   getAnalytics: () => api.get('/admin/analytics'),
+  getTransactions: (params) => api.get('/admin/transactions', { params }),
 };
 
 export const vendorService = {

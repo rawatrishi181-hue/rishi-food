@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, ShoppingBag, Utensils, Users, 
-  Ticket, HelpCircle, Bike, LogOut, ChevronRight, Menu, X
+  Ticket, HelpCircle, Bike, LogOut, ChevronRight, Menu, X, CreditCard
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Logo } from '../common/Logo';
@@ -15,6 +15,7 @@ export const AdminLayout = ({ children }) => {
   const menuItems = [
     { id: 'dashboard', icon: <LayoutDashboard />, label: 'Dashboard', path: '/admin' },
     { id: 'orders', icon: <ShoppingBag />, label: 'Orders', path: '/admin/orders' },
+    { id: 'transactions', icon: <CreditCard />, label: 'Transaction Logs', path: '/admin/transactions' },
     { id: 'restaurants', icon: <Utensils />, label: 'Restaurants', path: '/admin/restaurants' },
     { id: 'vendors', icon: <Users />, label: 'Vendors', path: '/admin/vendors' },
     { id: 'food', icon: <Utensils />, label: 'Food Menu', path: '/admin/food' },

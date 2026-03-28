@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { createPayment, verifyPayment, getPaymentHistory } = require('../controllers/paymentController');
-const { protect } = require('../middleware/authMiddleware');
+const { 
+    createDummyPayment, 
+    getAllTransactions, 
+    getUserTransactions 
+} = require('../controllers/paymentController');
+const { protect, authorize } = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -14,7 +18,7 @@ const { protect } = require('../middleware/authMiddleware');
  * @swagger
  * /api/payments/create:
  *   post:
- *     summary: Initialize a new payment
+ *     summary: Create a dummy payment transaction
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
@@ -27,64 +31,39 @@ const { protect } = require('../middleware/authMiddleware');
  *             required:
  *               - orderId
  *               - amount
+ *               - paymentMethod
  *             properties:
  *               orderId:
  *                 type: string
  *               amount:
  *                 type: number
- *               paymentGateway:
+ *               paymentMethod:
  *                 type: string
- *                 enum: [Razorpay, Stripe, Paypal, Wallet]
- *                 default: Razorpay
+ *                 enum: [UPI, CARD, COD]
  *     responses:
  *       201:
- *         description: Payment initialized
+ *         description: Payment created
  */
-router.post('/create', protect, createPayment);
+router.post('/create', protect, createDummyPayment);
 
 /**
  * @swagger
- * /api/payments/verify:
- *   post:
- *     summary: Verify payment status (Mock)
- *     tags: [Payments]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - transactionId
- *               - status
- *             properties:
- *               transactionId:
- *                 type: string
- *               status:
- *                 type: string
- *                 enum: [success, failure]
- *               gatewayResponse:
- *                 type: object
- *     responses:
- *       200:
- *         description: Payment verification status
- */
-router.post('/verify', protect, verifyPayment);
-
-/**
- * @swagger
- * /api/payments/history:
+ * /api/payments/user/{userId}:
  *   get:
- *     summary: Get payment history for current user (or all if admin)
+ *     summary: Get transaction history for a specific user
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
- *         description: Payment history list
+ *         description: User transaction history
  */
-router.get('/history', protect, getPaymentHistory);
+router.get('/user/:userId', protect, getUserTransactions);
 
 module.exports = router;

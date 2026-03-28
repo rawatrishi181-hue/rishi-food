@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/apiService';
 import { Button } from '../components/common/Button';
-import { User, Mail, Phone, MapPin, Save, UserCircle } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Save, UserCircle, CreditCard } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const { user, setUser } = useAuth();
@@ -100,6 +101,16 @@ const Profile = () => {
                 <Phone className="w-4 h-4 text-primary shrink-0" />
                 <span>{user.phone || 'No phone set'}</span>
               </div>
+            </div>
+
+            <div className="mt-8 w-full">
+              <Link 
+                to="/profile/transactions"
+                className="flex items-center justify-center gap-3 w-full py-4 bg-gray-50 dark:bg-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary transition-all rounded-2xl border border-gray-100 dark:border-gray-600 group"
+              >
+                <CreditCard className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                <span className="font-bold text-sm tracking-tight italic">Transaction History</span>
+              </Link>
             </div>
           </div>
         </div>

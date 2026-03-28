@@ -12,6 +12,7 @@ const {
     getOrdersReport,
     getDetailedAnalytics
 } = require('../controllers/adminController');
+const { getAllTransactions } = require('../controllers/paymentController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -20,6 +21,7 @@ const router = express.Router();
 router.use(protect);
 router.use(authorize('admin'));
 
+router.get('/transactions', getAllTransactions);
 router.get('/stats', getStats);
 router.get('/sales', getSalesData);
 router.get('/orders-distribution', getOrderDistribution);
