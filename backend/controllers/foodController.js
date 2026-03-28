@@ -2,7 +2,6 @@ const Food = require('../models/Food');
 const Restaurant = require('../models/Restaurant');
 const { sendResponse, sendError } = require('../utils/responseHandler');
 const { validationResult } = require('express-validator');
-const { getCache, setCache, deleteCache, deleteCacheByPattern, CACHE_KEYS, CACHE_TTL } = require('../utils/cache');
 
 /**
  * @desc    Get all food items for a specific restaurant
@@ -14,25 +13,12 @@ const getRestaurantMenu = async (req, res) => {
         const { restaurantId } = req.params;
         const { category } = req.query;
 
-        // Check cache
-        const cacheKey = category 
-            ? `foods:restaurant:${restaurantId}:${category}`
-            : CACHE_KEYS.FOODS(restaurantId);
-        
-        const cachedMenu = await getCache(cacheKey);
-        if (cachedMenu) {
-            return sendResponse(res, 200, 'Food items fetched successfully', cachedMenu);
-        }
-
         const filter = { restaurantId, isAvailable: true };
         if (category) {
             filter.category = category;
         }
 
         const menu = await Food.find(filter).lean().select('name price image category description');
-
-        // Cache the result
-        await setCache(cacheKey, menu, CACHE_TTL.FOODS);
 
         return sendResponse(res, 200, 'Food items fetched successfully', menu);
     } catch (error) {
@@ -48,14 +34,6 @@ const getRestaurantMenu = async (req, res) => {
  */
 const getFood = async (req, res) => {
     try {
-        const cacheKey = CACHE_KEYS.FOOD(req.params.id);
-        
-        // Check cache
-        const cachedFood = await getCache(cacheKey);
-        if (cachedFood) {
-            return sendResponse(res, 200, 'Food item details fetched successfully', cachedFood);
-        }
-
         const food = await Food.findById(req.params.id)
             .populate('restaurantId', 'name city')
             .lean();
@@ -63,9 +41,6 @@ const getFood = async (req, res) => {
         if (!food) {
             return sendError(res, 404, `Food item not found with id of ${req.params.id}`);
         }
-
-        // Cache the result
-        await setCache(cacheKey, food, CACHE_TTL.FOODS);
 
         return sendResponse(res, 200, 'Food item details fetched successfully', food);
     } catch (error) {
@@ -100,10 +75,6 @@ const createFood = async (req, res) => {
         }
 
         const food = await Food.create(req.body);
-
-        // Clear restaurant menu cache
-        await deleteCache(CACHE_KEYS.FOODS(restaurantId));
-        await deleteCacheByPattern(`foods:restaurant:${restaurantId}:*`);
 
         return sendResponse(res, 201, 'Food item created successfully', food);
     } catch (error) {
@@ -143,11 +114,6 @@ const updateFood = async (req, res) => {
         });
 
         await food.save();
-
-        // Clear caches
-        await deleteCache(CACHE_KEYS.FOOD(req.params.id));
-        await deleteCache(CACHE_KEYS.FOODS(restaurantId));
-        await deleteCacheByPattern(`foods:restaurant:${restaurantId}:*`);
 
         return sendResponse(res, 200, 'Food item updated successfully', food);
     } catch (error) {

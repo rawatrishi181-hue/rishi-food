@@ -1,7 +1,6 @@
 const Restaurant = require('../models/Restaurant');
 const { sendResponse, sendError } = require('../utils/responseHandler');
 const { validationResult } = require('express-validator');
-const { getCache, setCache, deleteCache, deleteCacheByPattern, CACHE_KEYS, CACHE_TTL } = require('../utils/cache');
 
 /**
  * @desc    Get all restaurants with search and filters
@@ -12,14 +11,6 @@ const getRestaurants = async (req, res) => {
     try {
         const { name, city, cuisine, rating, sort, page = 1, limit = 6 } = req.query;
         
-        // Check cache for default list (no filters)
-        if (!name && !city && !cuisine && !rating && page === '1' && limit === '6' && !sort) {
-            const cachedData = await getCache(CACHE_KEYS.RESTAURANTS);
-            if (cachedData) {
-                return sendResponse(res, 200, 'Restaurants fetched successfully', cachedData);
-            }
-        }
-
         let query = {};
 
         // Search by name (case-insensitive)
@@ -80,11 +71,6 @@ const getRestaurants = async (req, res) => {
             data
         };
 
-        // Cache default list
-        if (!name && !city && !cuisine && !rating && pageNum === 1 && limitNum === 6 && !sort) {
-            await setCache(CACHE_KEYS.RESTAURANTS, responseData, CACHE_TTL.RESTAURANTS);
-        }
-
         return sendResponse(res, 200, 'Restaurants fetched successfully', responseData);
     } catch (error) {
         console.error(error);
@@ -99,22 +85,11 @@ const getRestaurants = async (req, res) => {
  */
 const getRestaurant = async (req, res) => {
     try {
-        const cacheKey = CACHE_KEYS.RESTAURANT(req.params.id);
-        
-        // Check cache first
-        const cachedRestaurant = await getCache(cacheKey);
-        if (cachedRestaurant) {
-            return sendResponse(res, 200, 'Restaurant details fetched successfully', cachedRestaurant);
-        }
-
         const restaurant = await Restaurant.findById(req.params.id).lean();
 
         if (!restaurant) {
             return sendError(res, 404, `Restaurant not found with id of ${req.params.id}`);
         }
-
-        // Cache the restaurant data
-        await setCache(cacheKey, restaurant, CACHE_TTL.RESTAURANTS);
 
         return sendResponse(res, 200, 'Restaurant details fetched successfully', restaurant);
     } catch (error) {
@@ -139,9 +114,6 @@ const createRestaurant = async (req, res) => {
         req.body.ownerId = req.user._id;
 
         const restaurant = await Restaurant.create(req.body);
-
-        // Clear restaurant list cache
-        await deleteCache(CACHE_KEYS.RESTAURANTS);
 
         return sendResponse(res, 201, 'Restaurant created successfully', restaurant);
     } catch (error) {
