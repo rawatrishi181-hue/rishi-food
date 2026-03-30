@@ -17,7 +17,19 @@ const seedData = async () => {
         await Restaurant.deleteMany();
         await Category.deleteMany();
         await DeliveryPartner.deleteMany();
+        await User.deleteMany();
         
+        // 0. Setup Admin
+        const admin = await User.create({
+            name: 'Admin User',
+            email: 'admin@gmail.com',
+            password: 'adminpassword', // Change this in production!
+            role: 'admin',
+            phone: '8888888888',
+            address: 'Admin Office, City Center'
+        });
+        console.log('Admin User Created: admin@gmail.com / adminpassword');
+
         // 1. Setup Categories
         const categoryData = [
             { name: 'Pizza', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300' },

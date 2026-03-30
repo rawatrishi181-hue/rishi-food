@@ -1,21 +1,21 @@
 {
   "name": "rishi-food-ordering-app",
   "version": "1.0.0",
-  "description": "Full-stack Food Ordering App",
+  "private": true,
+  "description": "Full-stack Food Ordering App Monorepo",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "scripts": {
-    "install-backend": "cd backend && npm install",
-    "install-frontend": "cd frontend && npm install",
-    "install-all": "npm run install-backend && npm run install-frontend",
-    "build-frontend": "cd frontend && npm run build",
-    "start": "cd backend && npm start",
-    "backend": "cd backend && npm run dev",
-    "frontend": "cd frontend && npm run dev",
-    "dev": "concurrently \"npm run backend\" \"npm run frontend\""
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "install-all": "npm install",
+    "build:frontend": "npm run build --workspace=frontend",
+    "start:backend": "npm start --workspace=backend",
+    "backend": "npm run dev --workspace=backend",
+    "frontend": "npm run dev --workspace=frontend"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
-  },
-  "dependencies": {
-    "build": "^0.1.4"
   }
 }
